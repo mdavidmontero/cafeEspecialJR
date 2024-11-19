@@ -2,19 +2,19 @@ import React from "react";
 import { Text, View } from "react-native";
 import { MainLayout } from "../../layouts/MainLayout";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button } from "react-native-paper";
+import { logout } from "../../../actions/auth.actions";
+import { RegisterData } from "../register/RegisterData";
 
 export const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
   return (
     <MainLayout>
       <View
-        className="flex-1 justify-center items-center p-5"
+        className="items-center justify-center flex-1 p-5"
         style={{ paddingTop: top + 20 }}
       >
-        <Text className="text-lg  text-justify ">
-          Califica de 1 a 10 que tal te parecio el café, siendo 1 muy mala y
-          siendo 10 muy buena.
-        </Text>
+        <RegisterData />
       </View>
     </MainLayout>
   );

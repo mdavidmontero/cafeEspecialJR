@@ -1,7 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { useAuthStore } from "../store/useAuthStore";
 import AuthNavigator from "./AuthNavigation";
-import BottonTabsNavigation from "./BottonTabsNavigation";
+import StackNavigator from "./StackNavigator";
 
 const Stack = createStackNavigator();
 const MainNavigator = () => {
@@ -12,7 +12,7 @@ const MainNavigator = () => {
       {user?.roles === "CLIENTE" ? (
         <Stack.Screen
           name="Admin"
-          component={BottonTabsNavigation}
+          component={StackNavigator}
           options={{ headerShown: false }}
         />
       ) : (

@@ -161,7 +161,7 @@ export const RegisterScreen = () => {
                   }
                 >
                   <Text
-                    className=" font-bold text-white disabled:text-gray-300 uppercase"
+                    className="font-bold text-white uppercase  disabled:text-gray-300"
                     disabled={
                       values.nombre === "" ||
                       values.apellidos === "" ||

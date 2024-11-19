@@ -1,0 +1,37 @@
+{
+  "cli": {
+    "version": ">= 13.3.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_APIKEY": "AIzaSyBHRFEwiTBBmH0TgS9Ni42ksKGElVyKEOw",
+        "EXPO_PUBLIC_AUTHDOMAIN": "supremoapp-e58bf.firebaseapp.com",
+        "EXPO_PUBLIC_PROJECTID": "supremoapp-e58bf",
+        "EXPO_PUBLIC_STORAGEBUCKET": "supremoapp-e58bf.appspot.com",
+        "EXPO_PUBLIC_MESSAGINGSENDERID": "1023765458539",
+        "EXPO_PUBLIC_APPID": "1:1023765458539:web:d8f131a142121588230b2e"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_APIKEY": "AIzaSyBHRFEwiTBBmH0TgS9Ni42ksKGElVyKEOw",
+        "EXPO_PUBLIC_AUTHDOMAIN": "supremoapp-e58bf.firebaseapp.com",
+        "EXPO_PUBLIC_PROJECTID": "supremoapp-e58bf",
+        "EXPO_PUBLIC_STORAGEBUCKET": "supremoapp-e58bf.appspot.com",
+        "EXPO_PUBLIC_MESSAGINGSENDERID": "1023765458539",
+        "EXPO_PUBLIC_APPID": "1:1023765458539:web:d8f131a142121588230b2e"
+      }
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

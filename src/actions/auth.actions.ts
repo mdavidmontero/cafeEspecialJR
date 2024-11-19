@@ -64,7 +64,7 @@ export const login = async (
     return userCredential.user.uid;
   } catch (error: any) {
     if (error.code == "auth/invalid-credential") {
-      throw new Error("El correo electrónico o contraseña no son válidos.");
+      throw new Error("El correo electrónico o contrwaseña no son válidos.");
     }
 
     throw error;

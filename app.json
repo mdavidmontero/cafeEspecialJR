@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "cafeEspecialJR",
-    "slug": "cafeEspecialJR",
+    "name": "cafe Especial JR",
+    "slug": "cafeespecialjr",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FEFAF7"
     },
     "ios": {
       "supportsTablet": true
@@ -19,10 +19,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.mdavidrodriguez.cafeespecialjr"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b71304af-55dd-4061-9cf7-507676252b9d"
+      }
     }
   }
 }

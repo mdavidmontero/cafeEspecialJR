@@ -1,17 +1,14 @@
 import {
   getAuth,
-  deleteUser,
   createUserWithEmailAndPassword,
   UserCredential,
 } from "firebase/auth";
 import {
-  collection,
   DocumentData,
   doc,
   setDoc,
   updateDoc,
   DocumentSnapshot,
-  CollectionReference,
   getDoc,
 } from "firebase/firestore";
 import { db } from "../config/firebase/app";

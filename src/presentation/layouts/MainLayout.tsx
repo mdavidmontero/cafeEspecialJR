@@ -1,4 +1,3 @@
-import React from "react";
 import { ScrollView, ImageBackground, StyleSheet } from "react-native";
 
 export const MainLayout = ({ children }: { children: React.ReactNode }) => {

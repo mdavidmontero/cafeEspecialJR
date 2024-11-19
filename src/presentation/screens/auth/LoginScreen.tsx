@@ -1,7 +1,5 @@
 import { Text, TextInput, View, Image } from "react-native";
 import { useState } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { LoginUser } from "../../../types";
 import { login } from "../../../actions/auth.actions";
@@ -14,6 +12,7 @@ import AlertScreen from "../../components/shared/AlertScreen";
 import { AuthLayout } from "../../layouts/AuthLayout";
 import { useAuthStore } from "../../store/useAuthStore";
 import { RootStackParamList } from "../../navigation/AuthNavigation";
+import { useNavigation } from "@react-navigation/native";
 
 export const LoginScreen = () => {
   const [visible, setVisible] = useState(false);
@@ -74,7 +73,7 @@ export const LoginScreen = () => {
         }) => (
           <>
             <View className="mx-6">
-              <View className=" items-center">
+              <View className="items-center ">
                 <Image
                   source={require("../../../../assets/images/frase.png")}
                   style={{ width: 130, height: 130 }}
@@ -141,7 +140,7 @@ export const LoginScreen = () => {
                   }}
                 >
                   <Text
-                    className="text-white disabled:text-gray-300  uppercase"
+                    className="text-white uppercase disabled:text-gray-300"
                     disabled={
                       values.correo === "" ||
                       values.password === "" ||
