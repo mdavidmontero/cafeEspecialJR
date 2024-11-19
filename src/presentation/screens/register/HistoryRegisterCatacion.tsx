@@ -5,8 +5,12 @@ import {
   TextInput,
   FlatList,
   RefreshControl,
+  Alert,
 } from "react-native";
-import { getCatacionCafe } from "../../../actions/registroCatacion.actions";
+import {
+  deleteCatacionCafe,
+  getCatacionCafe,
+} from "../../../actions/registroCatacion.actions";
 import { MainLayout } from "../../layouts/MainLayout";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -14,7 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { formatDate } from "../../../utils";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, Button } from "react-native-paper";
 import { Timestamp } from "firebase/firestore";
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -79,6 +83,28 @@ export const HistoryRegisterCatacion = () => {
       })
     ) ?? [];
 
+  const handleDelete = async (id: string) => {
+    try {
+      Alert.alert("¿Estás seguro de eliminar esta catación?", "Eliminar", [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          onPress: async () => {
+            await deleteCatacionCafe(id);
+            refetch();
+          },
+        },
+      ]);
+
+      refetch();
+    } catch (error) {
+      console.error("Error al eliminar catación:", error);
+    }
+  };
+
   const loadMore = () => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
@@ -108,6 +134,25 @@ export const HistoryRegisterCatacion = () => {
         <View className="mt-4">
           <Text className="text-lg font-bold">Puntaje Final</Text>
           <Text>{item.puntajeFinal}</Text>
+        </View>
+
+        <View className="flex-row justify-between mt-4">
+          <Button
+            mode="contained"
+            onPress={() =>
+              navigation.navigate("UpdateRegisterCatacion", { id: item.id })
+            }
+            style={{ backgroundColor: "#0F4A2C" }}
+          >
+            Actualizar
+          </Button>
+          <Button
+            mode="contained"
+            onPress={() => handleDelete(item.id)}
+            style={{ backgroundColor: "#701615" }}
+          >
+            Eliminar
+          </Button>
         </View>
       </View>
     </Pressable>

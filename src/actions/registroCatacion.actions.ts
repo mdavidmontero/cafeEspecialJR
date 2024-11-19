@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   CollectionReference,
+  deleteDoc,
   doc,
   DocumentData,
   getDoc,
@@ -53,6 +54,29 @@ export const getCatacionCafeById = async (
     return data.data() as RegisterCatacion;
   } catch (error) {
     console.error("Error al obtener catación cafe:", error);
+    throw error;
+  }
+};
+
+export const updateCatacionCafe = async (
+  id: string,
+  newData: Partial<RegisterCatacion>
+): Promise<void> => {
+  try {
+    const docRef = doc(catacionCafeData, id);
+    await updateDoc(docRef, newData);
+  } catch (error) {
+    console.error("Error al actualizar catación cafe:", error);
+    throw error;
+  }
+};
+
+export const deleteCatacionCafe = async (id: string): Promise<void> => {
+  try {
+    const docRef = doc(catacionCafeData, id);
+    await deleteDoc(docRef);
+  } catch (error) {
+    console.error("Error al eliminar catación cafe:", error);
     throw error;
   }
 };
