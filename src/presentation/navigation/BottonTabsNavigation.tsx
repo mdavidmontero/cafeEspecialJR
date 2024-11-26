@@ -1,14 +1,14 @@
+import { View, Text, TouchableOpacity } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { HomeScreen } from "../screens/home/HomeScreen";
-import Entypo from "@expo/vector-icons/Entypo";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import { HistoryRegisterCatacion } from "../screens/register/HistoryRegisterCatacion";
 import { PresentationCoffee } from "../components/ui/PresentationCoffee";
+import { logout } from "../../actions/auth.actions";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Entypo from "@expo/vector-icons/Entypo";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { View, Text, TouchableOpacity } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { logout } from "../../actions/auth.actions";
 
 const Tab = createBottomTabNavigator();
 

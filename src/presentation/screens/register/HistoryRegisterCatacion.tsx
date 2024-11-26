@@ -22,6 +22,7 @@ import { ActivityIndicator, Button } from "react-native-paper";
 import { Timestamp } from "firebase/firestore";
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { RegisterCatacionSchema } from "../../../domain/entities/registerdata.entities";
 
 const ITEMS_PER_PAGE = 2;
 
@@ -39,7 +40,7 @@ export const HistoryRegisterCatacion = () => {
   const { top } = useSafeAreaInsets();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
-  const [codigoFincaFilter, setCodigoFincaFilter] = useState("");
+  const [cedula, setCedula] = useState("");
   const [codigoMuestraFilter, setCodigoMuestraFilter] = useState("");
   const [dateFilter, setDateFilter] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -61,11 +62,7 @@ export const HistoryRegisterCatacion = () => {
   const filteredData =
     data?.pages.flatMap((page) =>
       page.items.filter((item) => {
-        const matchesFinca = codigoFincaFilter
-          ? item.codigoFinca
-              .toLowerCase()
-              .includes(codigoFincaFilter.toLowerCase())
-          : true;
+        const matchesFinca = cedula ? item.cedula.includes(cedula) : true;
 
         const matchesMuestra = codigoMuestraFilter
           ? item.codigoMuestra
@@ -111,45 +108,81 @@ export const HistoryRegisterCatacion = () => {
     }
   };
 
-  const renderItem = ({ item }: { item: any }) => (
+  const renderItem = ({ item }: { item: RegisterCatacionSchema }) => (
     <Pressable
       onPress={() => navigation.navigate("DetailCatacion", { id: item.id })}
     >
-      <View className="p-4 mb-4 bg-white rounded-lg shadow-lg">
-        <View className="mt-4">
-          <Text className="text-lg font-bold">Fecha</Text>
-          <Text>{formatDate(item.fecha as unknown as Timestamp)}</Text>
+      <View className="p-4 mb-4 bg-white border rounded-lg shadow-md">
+        <View className="mt-2">
+          <Text className="text-base font-semibold text-gray-800">Fecha</Text>
+          <Text className="text-base text-gray-600">
+            {formatDate(item.fecha as unknown as Timestamp)}
+          </Text>
         </View>
-        <Text className="mb-2 text-2xl font-semibold">{item.nombre}</Text>
-        <Text className="text-gray-600">
-          Código de Finca: {item.codigoFinca}
+
+        <Text className="mt-1 text-base font-semibold text-gray-700">
+          Cédula: {item.cedula}
         </Text>
-        <Text className="text-gray-600">
+        <Text className="mt-1 text-base text-gray-600">
           Código de Muestra: {item.codigoMuestra}
         </Text>
+        <Text className="mt-1 text-base text-gray-600">
+          Municipio: {item.municipio}
+        </Text>
+
         <View className="mt-4">
-          <Text className="text-lg font-bold">Suma</Text>
-          <Text>{item.suma}</Text>
+          <Text className="text-base font-semibold text-gray-800">
+            Factor de Rendimiento
+          </Text>
+          <Text className="text-base text-gray-600">
+            {item.factorRendimiento}
+          </Text>
         </View>
+
         <View className="mt-4">
-          <Text className="text-lg font-bold">Puntaje Final</Text>
-          <Text>{item.puntajeFinal}</Text>
+          <Text className="text-base font-semibold text-gray-800">Merma</Text>
+          <Text className="text-base text-gray-600">{item.totalCafeValor}</Text>
         </View>
 
         <View className="flex-row justify-between mt-4">
+          <View className="w-1/2 pr-2">
+            <Text className="text-base font-semibold text-gray-800">Suma</Text>
+            <Text className="text-base text-gray-600">{item.suma}</Text>
+          </View>
+          <View className="w-1/2 pl-2">
+            <Text className="text-base font-semibold text-gray-800">
+              Puntaje Final
+            </Text>
+            <Text className="text-base text-gray-600">{item.puntajeFinal}</Text>
+          </View>
+        </View>
+
+        <View className="flex-row justify-between mt-6">
           <Button
             mode="contained"
+            textColor="#fff"
             onPress={() =>
               navigation.navigate("UpdateRegisterCatacion", { id: item.id })
             }
-            style={{ backgroundColor: "#0F4A2C" }}
+            style={{
+              backgroundColor: "#0F4A2C",
+              borderRadius: 8,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+            }}
           >
             Actualizar
           </Button>
           <Button
+            textColor="#fff"
             mode="contained"
             onPress={() => handleDelete(item.id)}
-            style={{ backgroundColor: "#701615" }}
+            style={{
+              backgroundColor: "#701615",
+              borderRadius: 8,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+            }}
           >
             Eliminar
           </Button>
@@ -176,14 +209,14 @@ export const HistoryRegisterCatacion = () => {
           fontWeight: "bold",
         }}
       >
-        Historial de Cataciones
+        Historial de Análisis
       </Text>
 
       <View className="px-4 py-2">
         <TextInput
-          placeholder="Filtrar por Código de Finca"
-          value={codigoFincaFilter}
-          onChangeText={setCodigoFincaFilter}
+          placeholder="Filtrar por Cédula"
+          value={cedula}
+          onChangeText={setCedula}
           className="p-2 mb-2 border border-gray-300 rounded"
         />
         <TextInput

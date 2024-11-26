@@ -1,11 +1,15 @@
 export type acidezData = {
   acidez: number;
   intensidadAcidez: string;
+  descripcionesAcidez: string[];
+  descripcionesAcidezNegativas: string[];
 };
 
 export type cuerpoData = {
   cuerpo: number;
   intensidadCuerpo: string;
+  descripcionesCuerpo: string[];
+  descripcionesCuerpoNegativas: string[];
 };
 
 export type FraganiaData = {
@@ -19,15 +23,37 @@ export type defectosData = {
   totalDefectos: number;
 };
 
+export type SaboresData = {
+  sabor: number;
+  saborResidual: number;
+  saboresAromas: string[];
+  saboresAromasNegativas: string[];
+};
+
 export interface RegisterCatacion {
-  nombre: string;
-  codigoFinca: string;
   codigoMuestra: string;
+  municipio: string;
+  codigoCGB: string;
+  codigoSICA: string;
+  productor: string;
+  cedula: string;
+  variedad: string;
+  proceso: string;
+  humedadCPS: number;
+  humedadAlmendra: number;
+  almendraTotal: number;
+  almendraSana: number;
+  broca: number;
+  grupoI: number;
+  grupoII: number;
+  anotacionesGrupo: string;
+  factorRendimiento: number;
+  totalCafeValor: number;
+  recomendaciones: string;
   nivelTueste: string;
   fecha: Date;
   fragancia: FraganiaData;
-  sabor: number;
-  saborResidual: number;
+  sabor: SaboresData;
   acidez: acidezData;
   cuerpo: cuerpoData;
   uniformidad: number | string;
@@ -39,6 +65,7 @@ export interface RegisterCatacion {
   notas: string;
   suma: number;
   puntajeFinal: number;
+  observaciones: string;
 }
 
 export type RegisterCatacionSchema = RegisterCatacion & {

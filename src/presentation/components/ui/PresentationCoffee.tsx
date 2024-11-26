@@ -1,4 +1,3 @@
-import React from "react";
 import { Image, Text, View } from "react-native";
 import { MainLayout } from "../../layouts/MainLayout";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -30,7 +29,7 @@ export const PresentationCoffee = () => {
         <View className="mt-2">
           <View className="flex-row items-center gap-2">
             <Entypo name="phone" size={24} color="black" />
-            <Text className="text-lg text-start">31480192251</Text>
+            <Text className="text-lg text-start">3148019251</Text>
           </View>
           <View className="flex-row items-center gap-2">
             <Entypo name="mail" size={24} color="black" />

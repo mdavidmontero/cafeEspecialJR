@@ -1,9 +1,7 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { MainLayout } from "../../layouts/MainLayout";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Button } from "react-native-paper";
-import { logout } from "../../../actions/auth.actions";
 import { RegisterData } from "../register/RegisterData";
 
 export const HomeScreen = () => {

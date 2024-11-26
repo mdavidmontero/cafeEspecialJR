@@ -40,3 +40,72 @@ export const createInitialSample = (): ISampleForm => ({
   sustraer: 0,
   total: 0,
 });
+
+export const SaboresAromas: string[] = [
+  "Citrico",
+  "Floral",
+  "Almendra, nueces",
+  "Miel, Caramelo",
+  "Frutas rojas, Bayas",
+  "Cedro",
+  "Albaricoque",
+  "Chocolate",
+  "Jazmin",
+];
+
+export const SaboresAromasNegativas: string[] = [
+  "Terroso",
+  "Cebolla",
+  "Cerezas fermentadas",
+  "Mohoso",
+  "Madera / viejo",
+  "Caucho",
+  "Medicinal",
+  "Yodo",
+  "Agrio / vinagre",
+];
+
+export const intensidadesCuerpoPositivas: string[] = [
+  "Sedoso",
+  "Suave",
+  "Jugoso",
+  "Cremoso",
+  "Almibarado",
+  "Aterciopelado",
+  "Lleno",
+  "Redondo",
+];
+
+export const intensidadesCuerpoNegativas: string[] = [
+  "Aguado",
+  "Áspero",
+  "Seco",
+  "Arenoso",
+  "Enpolvado",
+  "Aceitosa",
+  "Viscosa",
+  "Metálica",
+];
+
+export const intensidadesAcidezPositivas: string[] = [
+  "Brillante",
+  "Jugosa",
+  "Chispeante",
+  "Vivida",
+  "Delicada",
+  "Melosa",
+  "Compleja",
+  "Agria",
+  "Cítrica, Málica, etc.",
+  "Elegante",
+];
+
+export const intensidadesAcidezNegativas: string[] = [
+  "Agria",
+  "Vinagre /Acetica",
+  "Agresiva",
+  "Astringente",
+  "Aguada / penetrante",
+  "Áspera /Apagada",
+  "Metálica",
+];
