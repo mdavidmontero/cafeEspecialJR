@@ -25,7 +25,7 @@ function StackNavigator() {
         name="DetailCatacion"
         component={DetailCatacion}
         options={{
-          headerTitle: "Detalles de Catación",
+          headerTitle: "Detalles de Análisis",
         }}
       />
       <Stack.Screen

@@ -221,16 +221,16 @@ export const UpdateRegisterDataScreen = () => {
     calcularDefectos,
   ]);
 
-  const calcularAlmendraSana = useMemo(() => {
-    const total =
-      parseFloat(almendraTotal.replace(",", ".")) -
-      parseFloat(broca.replace(",", ".")) -
-      parseFloat(grupoI.replace(",", ".")) -
-      parseFloat(grupoII.replace(",", "."));
+  // const calcularAlmendraSana = useMemo(() => {
+  //   const total =
+  //     parseFloat(almendraTotal.replace(",", ".")) -
+  //     parseFloat(broca.replace(",", ".")) -
+  //     parseFloat(grupoI.replace(",", ".")) -
+  //     parseFloat(grupoII.replace(",", "."));
 
-    setAlmendraSana(total.toFixed(2));
-    return total.toFixed(2);
-  }, [almendraTotal, grupoI, grupoII, broca]);
+  //   setAlmendraSana(total.toFixed(2));
+  //   return total.toFixed(2);
+  // }, [almendraTotal, grupoI, grupoII, broca]);
 
   const totalGramos = 17500;
   const calcularFactorRendimiento = useMemo(() => {
@@ -578,6 +578,7 @@ export const UpdateRegisterDataScreen = () => {
                 className="w-full p-3 border border-gray-300 rounded bg-gray-50"
                 placeholder="% Humedad Almendra"
                 value={humedadAlmendra.toString()}
+                keyboardType="decimal-pad"
                 onChangeText={(value) => setHumedadAlmendra(value)}
               />
             </View>
@@ -603,14 +604,12 @@ export const UpdateRegisterDataScreen = () => {
               <TextInput
                 className="w-full p-3 border border-gray-300 rounded bg-gray-50"
                 placeholder="Cantidad en gramos"
-                value={
-                  almendraSana ? almendraSana : calcularAlmendraSana.toString()
-                }
+                value={almendraSana}
                 onChangeText={setAlmendraSana}
               />
-              <Text className="mt-2 text-sm font-semibold">
+              {/* <Text className="mt-2 text-sm font-semibold">
                 Calculado: {calcularAlmendraSana}
-              </Text>
+              </Text> */}
             </View>
           </View>
 
@@ -678,7 +677,11 @@ export const UpdateRegisterDataScreen = () => {
               <TextInput
                 className="w-full p-2 border border-gray-300 rounded bg-gray-50"
                 placeholder="Ej: 86.98"
-                value={calcularFactorRendimiento}
+                value={
+                  factorRendimiento
+                    ? factorRendimiento
+                    : calcularFactorRendimiento
+                }
                 onChangeText={setFactorRendimiento}
               />
             </View>

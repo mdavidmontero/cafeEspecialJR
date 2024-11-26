@@ -144,16 +144,16 @@ export const RegisterData = () => {
     calcularDefectos,
   ]);
 
-  const calcularAlmendraSana = useMemo(() => {
-    const total =
-      parseFloat(almendraTotal.replace(",", ".")) -
-      parseFloat(broca.replace(",", ".")) -
-      parseFloat(grupoI.replace(",", ".")) -
-      parseFloat(grupoII.replace(",", "."));
+  // const calcularAlmendraSana = useMemo(() => {
+  //   const total =
+  //     parseFloat(almendraTotal.replace(",", ".")) -
+  //     parseFloat(broca.replace(",", ".")) -
+  //     parseFloat(grupoI.replace(",", ".")) -
+  //     parseFloat(grupoII.replace(",", "."));
 
-    setAlmendraSana(total.toFixed(2));
-    return total.toFixed(2);
-  }, [almendraTotal, grupoI, grupoII, broca]);
+  //   setAlmendraSana(total.toFixed(2));
+  //   return total.toFixed(2);
+  // }, [almendraTotal, grupoI, grupoII, broca]);
 
   const totalGramos = 17500;
   const calcularFactorRendimiento = useMemo(() => {
@@ -502,6 +502,7 @@ export const RegisterData = () => {
                 className="w-full p-3 border border-gray-300 rounded bg-gray-50"
                 placeholder="% Humedad Almendra"
                 value={humedadAlmendra.toString()}
+                keyboardType="decimal-pad"
                 onChangeText={(value) => setHumedadAlmendra(value)}
               />
             </View>
@@ -527,18 +528,15 @@ export const RegisterData = () => {
               <TextInput
                 className="w-full p-3 border border-gray-300 rounded bg-gray-50"
                 placeholder="Cantidad en gramos"
-                value={
-                  almendraSana ? almendraSana : calcularAlmendraSana.toString()
-                }
+                value={almendraSana}
                 onChangeText={setAlmendraSana}
               />
-              <Text className="mt-2 text-sm font-semibold">
+              {/* <Text className="mt-2 text-sm font-semibold">
                 Calculado: {calcularAlmendraSana}
-              </Text>
+              </Text> */}
             </View>
           </View>
 
-          {/* Grupo */}
           <View className="flex-row flex-wrap gap-2 mb-4">
             <View className="w-1/3">
               <Text className="mb-1 text-lg font-bold text-gray-700">
@@ -553,7 +551,6 @@ export const RegisterData = () => {
               />
             </View>
 
-            {/* Grupo I */}
             <View className="w-1/3">
               <Text className="mb-1 text-lg font-bold text-gray-700">
                 Grupo I
@@ -567,7 +564,6 @@ export const RegisterData = () => {
               />
             </View>
 
-            {/* Grupo II */}
             <View className="w-1/3">
               <Text className="mb-1 text-lg font-bold text-gray-700">
                 Grupo II
@@ -602,7 +598,11 @@ export const RegisterData = () => {
               <TextInput
                 className="w-full p-2 border border-gray-300 rounded bg-gray-50"
                 placeholder="Ej: 86.98"
-                value={calcularFactorRendimiento}
+                value={
+                  factorRendimiento
+                    ? factorRendimiento
+                    : calcularFactorRendimiento
+                }
                 onChangeText={setFactorRendimiento}
               />
             </View>
@@ -703,7 +703,7 @@ export const RegisterData = () => {
           <Text className="text-lg font-bold text-gray-800">Negativas</Text>
           <PickerSelectedSaboresNegativas
             selectedValue={
-              (!saboresAromasNegativas.length && saborResidual) ||
+              (!saboresAromasNegativas.length && saboresAromasNegativas[0]) ||
               saboresAromasNegativas[0]
             }
             onValueChange={(itemValue) =>

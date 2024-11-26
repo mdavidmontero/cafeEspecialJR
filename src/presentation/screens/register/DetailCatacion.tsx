@@ -109,19 +109,15 @@ export const DetailCatacion = () => {
      <div class="section">
       <h2>Análisis Fisico</h2>
       <table>
-        <tr><td>Humedad Café Pergamino seco</td><td>${
+        <tr><td>% Humedad Café Pergamino seco</td><td>${
           data?.humedadCPS || "N/A"
         }</td></tr>
-        <tr><td>Humedad Almendra</td><td>${
+        <tr><td>% Humedad Almendra</td><td>${
           data?.humedadAlmendra || "N/A"
         }</td></tr>
-        <tr><td>Almendra Total</td><td> %${
-          data?.almendraTotal || "N/A"
-        }</td></tr>
-        <tr><td>Almendra Sana</td><td> % ${
-          data?.almendraSana || "N/A"
-        }</td></tr>
-        <tr><td>Broca</td><td> % ${data?.broca || "N/A"}</td></tr>
+        <tr><td>Almendra Total</td><td>${data?.almendraTotal || "N/A"}</td></tr>
+        <tr><td>Almendra Sana</td><td> ${data?.almendraSana || "N/A"}</td></tr>
+        <tr><td>% Broca </td><td>  ${data?.broca || "N/A"}</td></tr>
         <tr><td>Grupo I</td><td>${data?.grupoI || "N/A"}</td></tr>
         <tr><td>Grupo II</td><td>${data?.grupoII || "N/A"}</td></tr>
         <tr><td>Anotaciones</td><td>${data?.anotacionesGrupo || "N/A"}</td></tr>
