@@ -2,6 +2,8 @@ import React from "react";
 import { View, Text } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import {
+  GruposI,
+  GruposII,
   intensidadesAcidezNegativas,
   intensidadesAcidezPositivas,
   intensidadesCuerpoNegativas,
@@ -46,6 +48,35 @@ export const PickerSelectedProceso: React.FC<PickerSelectedProps> = ({
         <Picker.Item label="Honey" value="honey" />
         <Picker.Item label="Natural" value="natural" />
         <Picker.Item label="Otro" value="otro" />
+      </Picker>
+    </View>
+  );
+};
+
+export const PickerSelectedGruposI: React.FC<PickerSelectedProps> = ({
+  selectedValue,
+  onValueChange,
+}) => {
+  return (
+    <View className="mb-4">
+      <Picker selectedValue={selectedValue} onValueChange={onValueChange}>
+        {GruposI.map((item, index) => (
+          <Picker.Item label={item} value={item.toString()} key={index} />
+        ))}
+      </Picker>
+    </View>
+  );
+};
+export const PickerSelectedGruposII: React.FC<PickerSelectedProps> = ({
+  selectedValue,
+  onValueChange,
+}) => {
+  return (
+    <View className="mb-4">
+      <Picker selectedValue={selectedValue} onValueChange={onValueChange}>
+        {GruposII.map((item, index) => (
+          <Picker.Item label={item} value={item.toString()} key={index} />
+        ))}
       </Picker>
     </View>
   );
