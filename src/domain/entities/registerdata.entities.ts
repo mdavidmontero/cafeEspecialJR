@@ -43,7 +43,6 @@ export interface RegisterCatacion {
   broca: number;
   grupoI: number;
   grupoII: number;
-  anotacionesGrupo: string;
   factorRendimiento: number;
   totalCafeValor: number;
   recomendaciones: string;

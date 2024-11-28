@@ -156,109 +156,52 @@ export const intensidadesAcidezNegativas: string[] = [
   "Metálica",
 ];
 
-export const initialState: RegisterCatacion = {
+export const initialState = {
   codigoMuestra: "",
   municipio: "",
   departamento: "",
   codigoSICA: "",
+  proceso: "",
   productor: "",
   cedula: "",
   variedad: "",
-  proceso: "",
-  humedadCPS: 0,
-  humedadAlmendra: 0,
-  almendraTotal: 0,
-  almendraSana: 0,
-  broca: 0,
-  grupoI: 0,
-  grupoII: 0,
+  humedadCPS: "0",
+  humedadAlmendra: "0",
+  muestraCPS: "0",
+  almendraTotal: "0",
+  almendraSana: "0",
+  broca: "0",
+  grupoI: "0",
+  observacionesGrupoI: [],
+  grupoII: "0",
+  observacionesGrupoII: [],
   anotacionesGrupo: "",
-  factorRendimiento: 0,
-  totalCafeValor: 0,
+  factorRendimiento: "0",
+  totalCafeValor: "0",
   recomendaciones: "",
   nivelTueste: "",
-  fecha: new Date(),
-  fragancia: {
-    fragancia: 0,
-    cualidadSeco: "",
-    cualidadEspuma: "",
-  },
-  sabor: {
-    sabor: 0,
-    saborResidual: 0,
-    saboresAromas: [],
-  },
-  acidez: {
-    acidez: 0,
-    intensidadAcidez: "",
-    descripcionesAcidez: [],
-  },
-  cuerpo: {
-    cuerpo: 0,
-    intensidadCuerpo: "",
-    descripcionesCuerpo: [],
-  },
-  uniformidad: "",
-  balance: "",
-  tasaLimpia: 0,
-  dulzor: 0,
-  puntajeCatador: "",
-  defectos: {
-    Nrotazas: 0,
-    intensidad: 0,
-    totalDefectos: 0,
-  },
+  fragancia: 6,
+  cualidadSeco: "",
+  cualidadEspuma: "",
+  sabor: 6,
+  saborResidual: 6,
+  saboresAromas: [],
+  saboresResidual: [],
+  acidez: 6,
+  intensidadAcidez: "",
+  descripcionesAcidez: [],
+  cuerpo: 6,
+  descripcionesCuerpo: [],
+  intensidadCuerpo: "",
+  uniformidad: 0,
+  balance: 6,
+  puntajeCatador: 6,
+  checkboxes: Array(5).fill("unchecked"),
+  checkboxesDulzor: Array(5).fill("unchecked"),
+  nroTasalimpia: 0,
+  nroDulzor: 0,
+  tazas: 0,
+  intensidad: 0,
   notas: "",
-  suma: 0,
-  puntajeFinal: 0,
-};
-
-export type FormData = {
-  codigoMuestra: string;
-  municipio: string;
-  departamento: string;
-  codigoSICA: string;
-  proceso: string;
-  productor: string;
-  cedula: string;
-  variedad: string;
-  humedadCPS: string;
-  humedadAlmendra: string;
-  muestraCPS: string;
-  almendraTotal: string;
-  almendraSana: string;
-  broca: string;
-  grupoI: string;
-  observacionesGrupoI: string[];
-  grupoII: string;
-  observacionesGrupoII: string[];
-  anotacionesGrupo: string;
-  factorRendimiento: string;
-  totalCafeValor: string;
-  recomendaciones: string;
-  nivelTueste: string;
-  fragancia: number;
-  cualidadSeco: string;
-  cualidadEspuma: string;
-  sabor: number;
-  saborResidual: number;
-  saboresAromas: string[];
-  saboresResidual: string[];
-  acidez: number;
-  intensidadAcidez: string;
-  descripcionesAcidez: string[];
-  cuerpo: number;
-  descripcionesCuerpo: string[];
-  intensidadCuerpo: string;
-  uniformidad: number;
-  balance: number;
-  puntajeCatador: number;
-  checkboxes: ("checked" | "crossed" | "unchecked")[];
-  checkboxesDulzor: ("checked" | "crossed" | "unchecked")[];
-  nroTasalimpia: number;
-  nroDulzor: number;
-  tazas: number;
-  intensidad: number;
-  notas: string;
-  checkboxesUniformidad: ("checked" | "crossed" | "unchecked")[];
+  checkboxesUniformidad: Array(5).fill("unchecked"),
 };

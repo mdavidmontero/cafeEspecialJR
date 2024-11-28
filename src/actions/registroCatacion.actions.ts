@@ -22,10 +22,11 @@ const catacionCafeData: CollectionReference<DocumentData> = collection(
 
 export const createCatacionCafe = async (
   data: RegisterCatacion
-): Promise<void> => {
+): Promise<string> => {
   try {
     const docRef = await addDoc(catacionCafeData, data);
     await updateDoc(docRef, { id: docRef.id });
+    return docRef.id;
   } catch (error) {
     console.error("Error al crear catación cafe:", error);
     throw error;

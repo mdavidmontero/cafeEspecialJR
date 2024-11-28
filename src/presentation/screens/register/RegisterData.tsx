@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import {
   Text,
   View,
@@ -18,10 +18,16 @@ import {
   PickeSelectedIntensidadAcidez,
   PickeSelectedIntensidadCuerpo,
 } from "../../components/shared/PickerSelected";
-import { createCatacionCafe } from "../../../actions/registroCatacion.actions";
-import { useQueryClient } from "@tanstack/react-query";
+import {
+  createCatacionCafe,
+  getCatacionCafeById,
+  updateCatacionCafe,
+} from "../../../actions/registroCatacion.actions";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { PickerSelectedGruposII } from "../../components/shared/PickerSelected";
 import { MaterialIcons } from "@expo/vector-icons"; // Importa Expo Icons
+import NavigationBar from "../../components/ui/NavigationBar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const RegisterData = () => {
   const [codigoMuestra, setCodigoMuestra] = useState<string>("");
@@ -83,8 +89,13 @@ export const RegisterData = () => {
   const [checkboxesUniformidad, setCheckboxesUniformidad] = useState<
     ("checked" | "crossed" | "unchecked")[]
   >(Array(5).fill("unchecked"));
+  const [records, setRecords] = useState<any[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   const queryClient = useQueryClient();
+  useEffect(() => {
+    getData();
+  }, [currentIndex]);
 
   const handleCheckboxChange = useCallback(
     (index: number) => {
@@ -294,6 +305,79 @@ export const RegisterData = () => {
       setDescripcionesCuerpo([...descripcionesCuerpo, item]);
     }
   };
+  const savedAsynStorage = async (
+    id: string,
+    setRecords: React.Dispatch<React.SetStateAction<any[]>>
+  ) => {
+    try {
+      const existingData = await AsyncStorage.getItem("formRecords");
+      let records = existingData ? JSON.parse(existingData) : [];
+      records.push(id);
+      await AsyncStorage.setItem("formRecords", JSON.stringify(records));
+
+      setRecords(records);
+      console.log("ID guardado correctamente");
+    } catch (error) {
+      console.error("Error al guardar en AsyncStorage:", error);
+    }
+  };
+
+  const clearStorage = async () => {
+    try {
+      await AsyncStorage.removeItem("formRecords");
+      setRecords([]);
+    } catch (error) {
+      console.error("Error al borrar en AsyncStorage:", error);
+    }
+  };
+  const getData = async () => {
+    try {
+      const data = await getCatacionCafeById(records[currentIndex]);
+      if (data) {
+        setCodigoMuestra(data.codigoMuestra.toString());
+        setMunicipiop(data.municipio);
+        setCodigoSICA(data.codigoSICA);
+        setProceso(data.proceso);
+        setProductor(data.productor);
+        setCedula(data.cedula);
+        setVariedad(data.variedad);
+        setHumedadCPS(data.humedadCPS.toString());
+        setHumedadAlmendra(data.humedadAlmendra.toString());
+        setAlmendraTotal(data.almendraTotal.toString());
+        setAlmendraSana(data.almendraSana.toString());
+        setBroca(data.broca.toString());
+        setGrupoI(data.grupoI.toString());
+        setGrupoII(data.grupoII.toString());
+        setFactorRendimiento(data.factorRendimiento.toString());
+        setRecomendaciones(data.recomendaciones);
+        setTotalCafeValor(data.totalCafeValor.toString());
+        setNivelTueste(data.nivelTueste);
+        setFragancia(data.fragancia.fragancia);
+        setCualidadSeco(data.fragancia.cualidadSeco);
+        setCualidadEspuma(data.fragancia.cualidadEspuma);
+        setSabor(data.sabor.sabor);
+        setSaborResidual(data.sabor.saborResidual);
+        setSaboresAromas(data.sabor.saboresAromas);
+        setAcidez(data.acidez.acidez);
+        setIntensidadAcidez(data.acidez.intensidadAcidez);
+        setDescripcionesAcidez(data.acidez.descripcionesAcidez);
+        setCuerpo(data.cuerpo.cuerpo);
+        setIntensidadCuerpo(data.cuerpo.intensidadCuerpo);
+        setDescripcionesCuerpo(data.cuerpo.descripcionesCuerpo);
+        setIntensidadCuerpo(data.cuerpo.intensidadCuerpo);
+        setDescripcionesCuerpo(data.cuerpo.descripcionesCuerpo);
+        setUniformidad(+data.uniformidad);
+        setBalance(+data.balance);
+        setCheckboxesDulzor(Array(5).fill(false));
+        setPuntajeCatador(+data.puntajeCatador);
+        setTazas(data.defectos.Nrotazas);
+        setIntensidad(data.defectos.intensidad);
+        setNotas(data.notas);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleRegistroCatacion = async () => {
     const data = {
@@ -353,12 +437,24 @@ export const RegisterData = () => {
       suma: calcularSumaSliders,
       puntajeFinal: calcularNotaFinal,
     };
+
     try {
-      await createCatacionCafe(data);
+      if (records[currentIndex]) {
+        await updateCatacionCafe(records[currentIndex], data);
+        Alert.alert(
+          "Catación Actualizada",
+          "Catación Actualizada Correctamente",
+          [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+        );
+      } else {
+        const createcata = await createCatacionCafe(data);
+        await savedAsynStorage(createcata, setRecords);
+        Alert.alert("Catación Creada", "Catación Registrada Correctamente", [
+          { text: "OK", onPress: () => console.log("OK Pressed") },
+        ]);
+      }
+      // Invalidar la consulta después de crear o actualizar
       queryClient.invalidateQueries({ queryKey: ["catacionData"] });
-      Alert.alert("Catación Creada", "Catación Registrada Correctamente", [
-        { text: "OK", onPress: () => console.log("OK Pressed") },
-      ]);
 
       setCodigoMuestra("");
       setMunicipiop("");
@@ -397,6 +493,7 @@ export const RegisterData = () => {
       setCheckboxesUniformidad(Array(5).fill("unchecked"));
       setCheckboxes(Array(5).fill("unchecked"));
       setCheckboxesUniformidad(Array(5).fill("unchecked"));
+
       setNroTasalimpia(0);
       setNroDulzor(0);
       setTazas(0);
@@ -407,9 +504,14 @@ export const RegisterData = () => {
       Alert.alert("Error al crear catación cafe: ");
     }
   };
-
   return (
     <MainLayout>
+      <NavigationBar
+        records={records}
+        setRecords={setRecords}
+        currentIndex={currentIndex}
+        setCurrentIndex={setCurrentIndex}
+      />
       <ScrollView contentContainerStyle={{ padding: 12 }}>
         <Text className="mb-4 text-2xl font-bold text-center">
           Formulario de Catación
@@ -1033,6 +1135,20 @@ export const RegisterData = () => {
             onPress={handleRegistroCatacion}
           >
             Guardar Resultados
+          </Button>
+          <Button
+            style={{
+              backgroundColor: "#C5A03F",
+              borderRadius: 100,
+              width: 200,
+              height: 50,
+              justifyContent: "center",
+            }}
+            textColor="#FFFFFF"
+            mode="contained"
+            onPress={clearStorage}
+          >
+            Limpiar data
           </Button>
         </View>
       </ScrollView>
