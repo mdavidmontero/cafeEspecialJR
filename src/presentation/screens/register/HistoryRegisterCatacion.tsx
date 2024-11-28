@@ -10,6 +10,7 @@ import {
 import {
   deleteCatacionCafe,
   getCatacionCafe,
+  getLoteCatacion,
 } from "../../../actions/registroCatacion.actions";
 import { MainLayout } from "../../layouts/MainLayout";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,7 +18,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { formatDate } from "../../../utils";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { ActivityIndicator, Button } from "react-native-paper";
 import { Timestamp } from "firebase/firestore";
 import { useState } from "react";

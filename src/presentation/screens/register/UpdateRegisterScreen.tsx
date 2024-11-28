@@ -1,18 +1,25 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { Text, View, ScrollView, TextInput, Alert } from "react-native";
+import {
+  Text,
+  View,
+  ScrollView,
+  TextInput,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import Slider from "@react-native-community/slider";
-import { Button, Checkbox } from "react-native-paper";
+import { Button } from "react-native-paper";
 import { MainLayout } from "../../layouts/MainLayout";
 import {
   PickerSelected,
+  PickerSelectedGruposI,
+  PickerSelectedGruposII,
   PickerSelectedProceso,
   PickerSelectedSaboresAromas,
-  PickerSelectedSaboresNegativas,
   PickeSelectedIntensidadAcidez,
-  PickeSelectedIntensidadAcidezNegativas,
   PickeSelectedIntensidadCuerpo,
-  PickeSelectedIntensidadCuerpoNegativas,
 } from "../../components/shared/PickerSelected";
+import { MaterialIcons } from "@expo/vector-icons";
 import {
   getCatacionCafeById,
   updateCatacionCafe,
@@ -21,7 +28,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { StackScreenProps } from "@react-navigation/stack";
-import { SaboresAromasNegativas } from "../../../types";
 
 export const UpdateRegisterDataScreen = () => {
   const route =
@@ -32,7 +38,7 @@ export const UpdateRegisterDataScreen = () => {
   const { id } = route.params;
   const [codigoMuestra, setCodigoMuestra] = useState<string>("");
   const [municipio, setMunicipiop] = useState<string>("");
-  const [codigocgb, setCodigoCGB] = useState<string>("");
+  const [departamento, setDepartamento] = useState<string>("");
   const [codigoSICA, setCodigoSICA] = useState<string>("");
   const [proceso, setProceso] = useState<string>("");
   const [productor, setProductor] = useState<string>("");
@@ -40,12 +46,16 @@ export const UpdateRegisterDataScreen = () => {
   const [variedad, setVariedad] = useState<string>("");
   const [humedadCPS, setHumedadCPS] = useState<string>("0");
   const [humedadAlmendra, setHumedadAlmendra] = useState<string>("0");
+  const [muestraCPS, setMuestraCPS] = useState<string>("0");
   const [almendraTotal, setAlmendraTotal] = useState<string>("0");
   const [almendraSana, setAlmendraSana] = useState<string>("0");
   const [broca, setBroca] = useState<string>("0");
   const [grupoI, setGrupoI] = useState<string>("0");
+  const [observacionesGrupoI, setObservacionesGrupoI] = useState<string[]>([]);
   const [grupoII, setGrupoII] = useState<string>("0");
-  const [anotacionesGrupo, setAnotacionesGrupo] = useState<string>("");
+  const [observacionesGrupoII, setObservacionesGrupoII] = useState<string[]>(
+    []
+  );
   const [factorRendimiento, setFactorRendimiento] = useState<string>("0");
   const [totalCafeValor, setTotalCafeValor] = useState<string>("0");
   const [recomendaciones, setRecomendaciones] = useState("");
@@ -56,33 +66,34 @@ export const UpdateRegisterDataScreen = () => {
   const [sabor, setSabor] = useState<number>(6);
   const [saborResidual, setSaborResidual] = useState<number>(6);
   const [saboresAromas, setSaboresAromas] = useState<string[]>([]);
-  const [saboresAromasNegativas, setSaboresAromasNegativas] = useState<
-    string[]
-  >([]);
+  const [saboresResidual, setSaboresResidual] = useState<string[]>([]);
   const [acidez, setAcidez] = useState<number>(6);
   const [intensidadAcidez, setIntensidadAcidez] = useState<string>("");
   const [descripcionesAcidez, setDescripcionesAcidez] = useState<string[]>([]);
-  const [descripcionesAcidezNegativas, setDescripcionesAcidezNegativas] =
-    useState<string[]>([]);
+  useState<string[]>([]);
 
   const [cuerpo, setCuerpo] = useState<number>(6);
   const [descripcionesCuerpo, setDescripcionesCuerpo] = useState<string[]>([]);
-  const [descripcionesCuerpoNegativas, setDescripcionesCuerpoNegativas] =
-    useState<string[]>([]);
+  useState<string[]>([]);
   const [intensidadCuerpo, setIntensidadCuerpo] = useState<string>("");
-  const [uniformidad, setUniformidad] = useState<number>(6);
+  const [uniformidad, setUniformidad] = useState<number>(0);
   const [balance, setBalance] = useState<number>(6);
   const [puntajeCatador, setPuntajeCatador] = useState<number>(6);
-  const [checkboxes, setCheckboxes] = useState<boolean[]>(Array(5).fill(false));
-  const [checkboxesDulzor, setCheckboxesDulzor] = useState<boolean[]>(
-    Array(5).fill(false)
-  );
+  const [checkboxes, setCheckboxes] = useState<
+    ("checked" | "crossed" | "unchecked")[]
+  >(Array(5).fill("unchecked"));
+  const [checkboxesDulzor, setCheckboxesDulzor] = useState<
+    ("checked" | "crossed" | "unchecked")[]
+  >(Array(5).fill("unchecked"));
   const [nroTasalimpia, setNroTasalimpia] = useState<number>(0);
   const [nroDulzor, setNroDulzor] = useState<number>(0);
   const [tazas, setTazas] = useState<number>(0);
   const [intensidad, setIntensidad] = useState<number>(0);
   const [notas, setNotas] = useState<string>("");
-  const [observaciones, setObservaciones] = useState<string>("");
+
+  const [checkboxesUniformidad, setCheckboxesUniformidad] = useState<
+    ("checked" | "crossed" | "unchecked")[]
+  >(Array(5).fill("unchecked"));
 
   const getData = async () => {
     try {
@@ -90,20 +101,21 @@ export const UpdateRegisterDataScreen = () => {
       if (data) {
         setCodigoMuestra(data.codigoMuestra.toString());
         setMunicipiop(data.municipio);
-        setCodigoCGB(data.codigoCGB);
         setCodigoSICA(data.codigoSICA);
         setProceso(data.proceso);
         setProductor(data.productor);
         setCedula(data.cedula);
         setVariedad(data.variedad);
+        setMuestraCPS(data.muestraCPS.toString());
         setHumedadCPS(data.humedadCPS.toString());
         setHumedadAlmendra(data.humedadAlmendra.toString());
         setAlmendraTotal(data.almendraTotal.toString());
         setAlmendraSana(data.almendraSana.toString());
         setBroca(data.broca.toString());
-        setGrupoI(data.grupoI.toString());
-        setGrupoII(data.grupoII.toString());
-        setAnotacionesGrupo(data.anotacionesGrupo);
+        setGrupoI(data.grupoI.grupoI.toString());
+        setObservacionesGrupoI(data.grupoI.observacionesGrupoI);
+        setGrupoII(data.grupoII.grupoII.toString());
+        setObservacionesGrupoII(data.grupoII.observacionesGrupoII);
         setFactorRendimiento(data.factorRendimiento.toString());
         setRecomendaciones(data.recomendaciones);
         setTotalCafeValor(data.totalCafeValor.toString());
@@ -111,35 +123,26 @@ export const UpdateRegisterDataScreen = () => {
         setFragancia(data.fragancia.fragancia);
         setCualidadSeco(data.fragancia.cualidadSeco);
         setCualidadEspuma(data.fragancia.cualidadEspuma);
+        setSaboresAromas(data.fragancia.descripcionesAroma);
         setSabor(data.sabor.sabor);
         setSaborResidual(data.sabor.saborResidual);
-        setSaboresAromas(data.sabor.saboresAromas);
-        setSaboresAromasNegativas(data.sabor.saboresAromasNegativas);
+        setSaboresResidual(data.sabor.saboresSabores);
         setAcidez(data.acidez.acidez);
         setIntensidadAcidez(data.acidez.intensidadAcidez);
         setDescripcionesAcidez(data.acidez.descripcionesAcidez);
-        setDescripcionesAcidezNegativas(
-          data.acidez.descripcionesAcidezNegativas
-        );
         setCuerpo(data.cuerpo.cuerpo);
         setIntensidadCuerpo(data.cuerpo.intensidadCuerpo);
         setDescripcionesCuerpo(data.cuerpo.descripcionesCuerpo);
-        setDescripcionesCuerpoNegativas(
-          data.cuerpo.descripcionesCuerpoNegativas
-        );
         setIntensidadCuerpo(data.cuerpo.intensidadCuerpo);
-        setDescripcionesCuerpo(data.cuerpo.descripcionesCuerpo);
-        setDescripcionesCuerpoNegativas(
-          data.cuerpo.descripcionesCuerpoNegativas
-        );
         setUniformidad(+data.uniformidad);
         setBalance(+data.balance);
         setCheckboxesDulzor(Array(5).fill(false));
+        setCheckboxesUniformidad(Array(5).fill(false));
+        setCheckboxes(Array(5).fill(false));
         setPuntajeCatador(+data.puntajeCatador);
         setTazas(data.defectos.Nrotazas);
         setIntensidad(data.defectos.intensidad);
         setNotas(data.notas);
-        setObservaciones(data.observaciones);
       }
     } catch (error) {
       console.log(error);
@@ -154,16 +157,43 @@ export const UpdateRegisterDataScreen = () => {
   const handleCheckboxChange = useCallback(
     (index: number) => {
       const updatedCheckboxes = [...checkboxes];
-      updatedCheckboxes[index] = !updatedCheckboxes[index];
+      if (updatedCheckboxes[index] === "unchecked") {
+        updatedCheckboxes[index] = "checked";
+      } else if (updatedCheckboxes[index] === "checked") {
+        updatedCheckboxes[index] = "crossed";
+      } else {
+        updatedCheckboxes[index] = "unchecked";
+      }
       setCheckboxes(updatedCheckboxes);
     },
     [checkboxes]
   );
 
+  const handleCheckboxUniformidad = useCallback(
+    (index: number) => {
+      const updatedCheckboxes = [...checkboxesUniformidad];
+      if (updatedCheckboxes[index] === "unchecked") {
+        updatedCheckboxes[index] = "checked";
+      } else if (updatedCheckboxes[index] === "checked") {
+        updatedCheckboxes[index] = "crossed";
+      } else {
+        updatedCheckboxes[index] = "unchecked";
+      }
+      setCheckboxesUniformidad(updatedCheckboxes);
+    },
+    [checkboxesUniformidad]
+  );
+
   const handleCheckboxChangeDulzor = useCallback(
     (index: number) => {
       const updatedCheckboxes = [...checkboxesDulzor];
-      updatedCheckboxes[index] = !updatedCheckboxes[index];
+      if (updatedCheckboxes[index] === "unchecked") {
+        updatedCheckboxes[index] = "checked";
+      } else if (updatedCheckboxes[index] === "checked") {
+        updatedCheckboxes[index] = "crossed";
+      } else {
+        updatedCheckboxes[index] = "unchecked";
+      }
       setCheckboxesDulzor(updatedCheckboxes);
     },
     [checkboxesDulzor]
@@ -175,15 +205,30 @@ export const UpdateRegisterDataScreen = () => {
   );
 
   const calcularTotalCheckboxesTasaLimpia = useMemo(() => {
-    const marcados = checkboxes.filter((checked) => checked).length;
-    setNroTasalimpia(10 - marcados * 2);
-    return 10 - marcados * 2;
+    const total = checkboxes.reduce(
+      (acc, state) => (state === "checked" ? acc + 2 : acc),
+      0
+    );
+    setNroTasalimpia(total);
+    return total;
   }, [checkboxes]);
 
+  const calcularTotalCheckboxesUniformidad = useMemo(() => {
+    const total = checkboxesUniformidad.reduce(
+      (acc, state) => (state === "checked" ? acc + 2 : acc),
+      0
+    );
+    setUniformidad(total);
+    return total;
+  }, [checkboxesUniformidad]);
+
   const calcularTotalCheckboxesDulzor = useMemo(() => {
-    const marcados = checkboxesDulzor.filter((checked) => checked).length;
-    setNroDulzor(10 - marcados * 2);
-    return 10 - marcados * 2;
+    const total = checkboxesDulzor.reduce(
+      (acc, state) => (state === "checked" ? acc + 2 : acc),
+      0
+    );
+    setNroDulzor(total);
+    return total;
   }, [checkboxesDulzor]);
 
   const calcularSumaSliders = useMemo(() => {
@@ -194,6 +239,8 @@ export const UpdateRegisterDataScreen = () => {
       saborResidual +
       cuerpo +
       uniformidad +
+      nroDulzor +
+      nroTasalimpia +
       balance +
       puntajeCatador
     );
@@ -209,32 +256,18 @@ export const UpdateRegisterDataScreen = () => {
   ]);
 
   const calcularNotaFinal = useMemo(() => {
-    const totalCheckboxes = calcularTotalCheckboxesTasaLimpia;
-    const totalCheckboxesDulzor = calcularTotalCheckboxesDulzor;
     const defectos = calcularDefectos;
-    const totalChecboxTasaDulzura = totalCheckboxes + totalCheckboxesDulzor;
-    return calcularSumaSliders + totalChecboxTasaDulzura - defectos;
+    return calcularSumaSliders - defectos;
   }, [
     calcularSumaSliders,
     calcularTotalCheckboxesTasaLimpia,
     calcularTotalCheckboxesDulzor,
+    calcularTotalCheckboxesUniformidad,
     calcularDefectos,
   ]);
-
-  // const calcularAlmendraSana = useMemo(() => {
-  //   const total =
-  //     parseFloat(almendraTotal.replace(",", ".")) -
-  //     parseFloat(broca.replace(",", ".")) -
-  //     parseFloat(grupoI.replace(",", ".")) -
-  //     parseFloat(grupoII.replace(",", "."));
-
-  //   setAlmendraSana(total.toFixed(2));
-  //   return total.toFixed(2);
-  // }, [almendraTotal, grupoI, grupoII, broca]);
-
   const totalGramos = 17500;
   const calcularFactorRendimiento = useMemo(() => {
-    const almendraSanaValue = parseFloat(almendraSana);
+    const almendraSanaValue = parseFloat(almendraSana.replace(",", "."));
 
     if (isNaN(almendraSanaValue) || almendraSanaValue <= 0) {
       return "0.00";
@@ -246,9 +279,10 @@ export const UpdateRegisterDataScreen = () => {
   }, [almendraSana]);
 
   const calcularTotalCafeValor = useMemo(() => {
-    const almendraTotales = parseFloat(almendraTotal.replace(",", "."));
-    const almedraSanaValue = parseFloat(almendraSana.replace(",", "."));
-    const calculo = (almendraTotales - almedraSanaValue) / 2.5;
+    const almendraTotales = parseFloat(muestraCPS.replace(",", "."));
+    const almedraSanaValue = parseFloat(almendraTotal.replace(",", "."));
+    const calculo =
+      ((almendraTotales - almedraSanaValue) / almendraTotales) * 100;
     setTotalCafeValor(calculo.toFixed(2));
     return calculo.toFixed(2);
   }, [almendraSana, almendraTotal]);
@@ -263,15 +297,41 @@ export const UpdateRegisterDataScreen = () => {
     }
   };
 
-  const agregarSaboresAromasNegativas = (item: string) => {
-    const index = saboresAromasNegativas.findIndex((sabor) => sabor === item);
+  const agregarSaboresResidual = (item: string) => {
+    const index = saboresResidual.findIndex((sabor) => sabor === item);
     if (index !== -1) {
-      setSaboresAromasNegativas(
-        saboresAromasNegativas.filter((sabor) => sabor !== item)
+      setSaboresResidual(saboresResidual.filter((sabor) => sabor !== item));
+    }
+    if (index === -1) {
+      setSaboresResidual([...saboresResidual, item]);
+    }
+  };
+
+  const agregarObservacionesGrupoI = (item: string) => {
+    const index = observacionesGrupoI.findIndex(
+      (observacion) => observacion === item
+    );
+    if (index !== -1) {
+      setObservacionesGrupoI(
+        observacionesGrupoI.filter((observacion) => observacion !== item)
       );
     }
     if (index === -1) {
-      setSaboresAromasNegativas([...saboresAromasNegativas, item]);
+      setObservacionesGrupoI([...observacionesGrupoI, item]);
+    }
+  };
+
+  const agregarObservacionesGrupoII = (item: string) => {
+    const index = observacionesGrupoII.findIndex(
+      (observacion) => observacion === item
+    );
+    if (index !== -1) {
+      setObservacionesGrupoII(
+        observacionesGrupoII.filter((observacion) => observacion !== item)
+      );
+    }
+    if (index === -1) {
+      setObservacionesGrupoII([...observacionesGrupoII, item]);
     }
   };
 
@@ -289,22 +349,6 @@ export const UpdateRegisterDataScreen = () => {
     }
   };
 
-  const agregarDescripcionesAcidezNegativas = (item: string) => {
-    const index = descripcionesAcidezNegativas.findIndex(
-      (descripcion) => descripcion === item
-    );
-    if (index !== -1) {
-      setDescripcionesAcidezNegativas(
-        descripcionesAcidezNegativas.filter(
-          (descripcion) => descripcion !== item
-        )
-      );
-    }
-    if (index === -1) {
-      setDescripcionesAcidezNegativas([...descripcionesAcidezNegativas, item]);
-    }
-  };
-
   const agregarDescripcionesCuerpo = (item: string) => {
     const index = descripcionesCuerpo.findIndex(
       (descripcion) => descripcion === item
@@ -319,84 +363,73 @@ export const UpdateRegisterDataScreen = () => {
     }
   };
 
-  const agregarDescripcionesCuerpoNegativas = (item: string) => {
-    const index = descripcionesCuerpoNegativas.findIndex(
-      (descripcion) => descripcion === item
-    );
-    if (index !== -1) {
-      setDescripcionesCuerpoNegativas(
-        descripcionesCuerpoNegativas.filter(
-          (descripcion) => descripcion !== item
-        )
-      );
-    }
-    if (index === -1) {
-      setDescripcionesCuerpoNegativas([...descripcionesCuerpoNegativas, item]);
-    }
+  const dataEnvio = {
+    fecha: new Date(),
+    codigoMuestra: codigoMuestra,
+    codigoSICA: codigoSICA,
+    departamento: departamento,
+    municipio: municipio,
+    proceso: proceso,
+    productor: productor,
+    cedula: cedula,
+    variedad: variedad,
+    humedadCPS: +humedadCPS,
+    humedadAlmendra: +humedadAlmendra,
+    muestraCPS: +muestraCPS,
+    almendraTotal: +almendraTotal,
+    almendraSana: +almendraSana,
+    broca: +broca,
+    grupoI: {
+      grupoI: +grupoI,
+      observacionesGrupoI: observacionesGrupoI,
+    },
+    grupoII: {
+      grupoII: +grupoII,
+      observacionesGrupoII: observacionesGrupoII,
+    },
+    observacionesGrupoII: observacionesGrupoII,
+    factorRendimiento: +factorRendimiento,
+    totalCafeValor: +totalCafeValor,
+    recomendaciones: recomendaciones,
+    nivelTueste: nivelTueste,
+    fragancia: {
+      fragancia: fragancia,
+      cualidadSeco: cualidadSeco,
+      cualidadEspuma: cualidadEspuma,
+      descripcionesAroma: saboresAromas,
+    },
+    sabor: {
+      sabor: sabor,
+      saborResidual: saborResidual,
+      saboresSabores: saboresResidual,
+    },
+    acidez: {
+      acidez: acidez,
+      intensidadAcidez: intensidadAcidez,
+      descripcionesAcidez: descripcionesAcidez,
+    },
+    cuerpo: {
+      cuerpo: cuerpo,
+      intensidadCuerpo: intensidadCuerpo,
+      descripcionesCuerpo: descripcionesCuerpo,
+    },
+    uniformidad: uniformidad,
+    balance: balance,
+    tasaLimpia: nroTasalimpia,
+    dulzor: nroDulzor,
+    puntajeCatador: puntajeCatador,
+    defectos: {
+      Nrotazas: tazas,
+      intensidad: intensidad,
+      totalDefectos: calcularDefectos,
+    },
+    notas: notas,
+    suma: calcularSumaSliders,
+    puntajeFinal: calcularNotaFinal,
   };
 
   const handleRegistroCatacion = async () => {
-    const data = {
-      fecha: new Date(),
-      codigoMuestra: codigoMuestra,
-      municipio: municipio,
-      codigoCGB: codigocgb,
-      codigoSICA: codigoSICA,
-      proceso: proceso,
-      productor: productor,
-      cedula: cedula,
-      variedad: variedad,
-      humedadCPS: +humedadCPS,
-      humedadAlmendra: +humedadAlmendra,
-      almendraTotal: +almendraTotal,
-      almendraSana: +almendraSana,
-      broca: +broca,
-      grupoI: +grupoI,
-      grupoII: +grupoII,
-      anotacionesGrupo: anotacionesGrupo,
-      factorRendimiento: +factorRendimiento,
-      recomendaciones: recomendaciones,
-      totalCafeValor: +totalCafeValor,
-      nivelTueste: nivelTueste,
-      fragancia: {
-        fragancia: fragancia,
-        cualidadSeco: cualidadSeco,
-        cualidadEspuma: cualidadEspuma,
-      },
-      sabor: {
-        sabor: sabor,
-        saborResidual: saborResidual,
-        saboresAromas: saboresAromas,
-        saboresAromasNegativas: saboresAromasNegativas,
-      },
-      saborResidual: saborResidual,
-      acidez: {
-        acidez: acidez,
-        intensidadAcidez: intensidadAcidez,
-        descripcionesAcidez: descripcionesAcidez,
-        descripcionesAcidezNegativas: descripcionesAcidezNegativas,
-      },
-      cuerpo: {
-        cuerpo: cuerpo,
-        intensidadCuerpo: intensidadCuerpo,
-        descripcionesCuerpo: descripcionesCuerpo,
-        descripcionesCuerpoNegativas: descripcionesCuerpoNegativas,
-      },
-      uniformidad: uniformidad,
-      balance: balance,
-      tasaLimpia: nroTasalimpia,
-      dulzor: nroDulzor,
-      puntajeCatador: puntajeCatador,
-      defectos: {
-        Nrotazas: tazas,
-        intensidad: intensidad,
-        totalDefectos: calcularDefectos,
-      },
-      notas: notas,
-      suma: calcularSumaSliders,
-      puntajeFinal: calcularNotaFinal,
-      observaciones: observaciones,
-    };
+    const data = dataEnvio;
     try {
       await updateCatacionCafe(id, data);
       queryClient.invalidateQueries({ queryKey: ["catacionData"] });
@@ -408,9 +441,8 @@ export const UpdateRegisterDataScreen = () => {
 
       setCodigoMuestra("");
       setMunicipiop("");
-      setCodigoCGB("");
+      setDepartamento("");
       setCodigoSICA("");
-      setProceso("");
       setProductor("");
       setCedula("");
       setVariedad("");
@@ -421,33 +453,38 @@ export const UpdateRegisterDataScreen = () => {
       setBroca("0");
       setGrupoI("0");
       setGrupoII("0");
-      setAnotacionesGrupo("");
       setFactorRendimiento("0");
       setRecomendaciones("");
       setTotalCafeValor("0");
-      setCodigoMuestra("");
       setNivelTueste("");
       setFragancia(6);
       setCualidadSeco("");
       setCualidadEspuma("");
       setSabor(6);
       setSaborResidual(6);
+      setSaboresAromas([]);
+      setSaboresResidual([]);
+      setObservacionesGrupoII([]);
+      setObservacionesGrupoI([]);
       setAcidez(6);
       setIntensidadAcidez("");
+      setDescripcionesAcidez([]);
+
       setCuerpo(6);
       setIntensidadCuerpo("");
+      setDescripcionesCuerpo([]);
       setUniformidad(6);
       setBalance(6);
       setPuntajeCatador(6);
-      setCheckboxes(Array(5).fill(false));
-      setCheckboxesDulzor(Array(5).fill(false));
+      setCheckboxesUniformidad(Array(5).fill("unchecked"));
+      setCheckboxes(Array(5).fill("unchecked"));
+      setCheckboxesUniformidad(Array(5).fill("unchecked"));
       setNroTasalimpia(0);
       setNroDulzor(0);
       setTazas(0);
       setIntensidad(0);
       setNotas("");
       setTazas(0);
-      setObservaciones("");
       navigation.goBack();
     } catch (error) {
       Alert.alert("Error al crear catación cafe: ");
@@ -460,57 +497,51 @@ export const UpdateRegisterDataScreen = () => {
         <Text className="mb-4 text-2xl font-bold text-center">
           Formulario de Catación
         </Text>
-        <Text className="mb-2 text-lg font-bold">
+        <Text className="mb-2 text-lg font-bold text-center">
           Análisis Fisico y Sensorial
         </Text>
         <View className="gap-4 mb-6">
-          <View className="gap-2">
-            <View>
-              <Text className="text-lg font-bold text-gray-700">
-                Código Muestra
-              </Text>
-              <TextInput
-                className="w-full p-3 border border-gray-300 rounded bg-gray-50"
-                placeholder="Código Muestra"
-                value={codigoMuestra}
-                onChangeText={setCodigoMuestra}
-              />
-            </View>
-            <View>
-              <Text className="text-lg font-bold text-gray-700">Municipio</Text>
-              <TextInput
-                className="w-full p-3 border border-gray-300 rounded bg-gray-50"
-                placeholder="Nombre Municipio"
-                value={municipio}
-                onChangeText={setMunicipiop}
-              />
-            </View>
+          <View className="flex-1">
+            <Text className="text-lg font-bold text-gray-700">
+              Código Muestra
+            </Text>
+            <TextInput
+              className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+              placeholder="Ej: SN_09"
+              value={codigoMuestra}
+              onChangeText={setCodigoMuestra}
+            />
+          </View>
+          <View className="flex-1">
+            <Text className="text-lg font-bold text-gray-700">Código SICA</Text>
+            <TextInput
+              className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+              placeholder="Código SICA"
+              value={codigoSICA}
+              keyboardType="numeric"
+              onChangeText={setCodigoSICA}
+            />
           </View>
 
-          <View className="flex-row gap-2">
-            <View className="flex-1">
-              <Text className="text-lg font-bold text-gray-700">
-                Código CGB
-              </Text>
-              <TextInput
-                className="w-full p-3 border border-gray-300 rounded bg-gray-50"
-                placeholder="Ej: SN_09"
-                value={codigocgb}
-                onChangeText={setCodigoCGB}
-              />
-            </View>
-            <View className="flex-1">
-              <Text className="text-lg font-bold text-gray-700">
-                Código SICA
-              </Text>
-              <TextInput
-                className="w-full p-3 border border-gray-300 rounded bg-gray-50"
-                placeholder="Código SICA"
-                value={codigoSICA}
-                keyboardType="numeric"
-                onChangeText={setCodigoSICA}
-              />
-            </View>
+          <View>
+            <Text className="text-lg font-bold text-gray-700">
+              Departamento
+            </Text>
+            <TextInput
+              className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+              placeholder="Departamento"
+              value={departamento}
+              onChangeText={setDepartamento}
+            />
+          </View>
+          <View>
+            <Text className="text-lg font-bold text-gray-700">Municipio</Text>
+            <TextInput
+              className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+              placeholder="Nombre Municipio"
+              value={municipio}
+              onChangeText={setMunicipiop}
+            />
           </View>
 
           <View className="flex-1">
@@ -587,6 +618,18 @@ export const UpdateRegisterDataScreen = () => {
           <View className="flex-row gap-2">
             <View className="flex-1">
               <Text className="text-lg font-bold text-gray-700">
+                Muestra C.P.S (gramos)
+              </Text>
+              <TextInput
+                className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+                placeholder="Cantidad en gramos"
+                value={muestraCPS.toString()}
+                keyboardType="decimal-pad"
+                onChangeText={(value) => setMuestraCPS(value)}
+              />
+            </View>
+            <View className="flex-1">
+              <Text className="text-lg font-bold text-gray-700">
                 Almendra Total
               </Text>
               <TextInput
@@ -605,17 +648,14 @@ export const UpdateRegisterDataScreen = () => {
                 className="w-full p-3 border border-gray-300 rounded bg-gray-50"
                 placeholder="Cantidad en gramos"
                 value={almendraSana}
+                keyboardType="decimal-pad"
                 onChangeText={setAlmendraSana}
               />
-              {/* <Text className="mt-2 text-sm font-semibold">
-                Calculado: {calcularAlmendraSana}
-              </Text> */}
             </View>
           </View>
 
-          {/* Grupo */}
-          <View className="flex-row flex-wrap gap-2 mb-4">
-            <View className="w-1/3">
+          <View className="gap-2">
+            <View className="flex-1">
               <Text className="mb-1 text-lg font-bold text-gray-700">
                 % Broca
               </Text>
@@ -628,8 +668,7 @@ export const UpdateRegisterDataScreen = () => {
               />
             </View>
 
-            {/* Grupo I */}
-            <View className="w-1/3">
+            <View className="flex-1">
               <Text className="mb-1 text-lg font-bold text-gray-700">
                 Grupo I
               </Text>
@@ -640,10 +679,23 @@ export const UpdateRegisterDataScreen = () => {
                 keyboardType="decimal-pad"
                 onChangeText={setGrupoI}
               />
+              <PickerSelectedGruposI
+                selectedValue={
+                  (!observacionesGrupoI.length && observacionesGrupoI[0]) ||
+                  observacionesGrupoI[0]
+                }
+                onValueChange={(itemValue) =>
+                  agregarObservacionesGrupoI(itemValue)
+                }
+              />
+              <Text className="text-lg text-justify text-gray-800">
+                {observacionesGrupoI.length
+                  ? observacionesGrupoI.join(", ")
+                  : ""}
+              </Text>
             </View>
 
-            {/* Grupo II */}
-            <View className="w-1/3">
+            <View className="flex-1">
               <Text className="mb-1 text-lg font-bold text-gray-700">
                 Grupo II
               </Text>
@@ -654,26 +706,30 @@ export const UpdateRegisterDataScreen = () => {
                 keyboardType="decimal-pad"
                 onChangeText={setGrupoII}
               />
+              <PickerSelectedGruposII
+                selectedValue={
+                  (!observacionesGrupoII.length && observacionesGrupoII[0]) ||
+                  observacionesGrupoII[0]
+                }
+                onValueChange={(itemValue) =>
+                  agregarObservacionesGrupoII(itemValue)
+                }
+              />
+              <Text className="text-lg text-justify text-gray-800">
+                {observacionesGrupoII.length
+                  ? observacionesGrupoII.join(", ")
+                  : ""}
+              </Text>
             </View>
-          </View>
-
-          <View>
-            <Text className="text-lg font-bold text-gray-700">Anotaciones</Text>
-            <TextInput
-              className="w-full p-3 border border-gray-300 rounded bg-gray-50"
-              placeholder="Escribe tus observaciones"
-              value={anotacionesGrupo}
-              onChangeText={setAnotacionesGrupo}
-            />
           </View>
         </View>
 
         <View className="flex-1 mb-4">
-          <Text className="mb-1 text-lg font-bold text-gray-700">
-            Factor de Rendimiento y Merma
-          </Text>
           <View className="flex-row items-center gap-2">
             <View className="flex-1">
+              <Text className="mb-1 text-lg font-bold text-gray-700">
+                Factor Rendimiento
+              </Text>
               <TextInput
                 className="w-full p-2 border border-gray-300 rounded bg-gray-50"
                 placeholder="Ej: 86.98"
@@ -686,6 +742,9 @@ export const UpdateRegisterDataScreen = () => {
               />
             </View>
             <View className="flex-1">
+              <Text className="mb-1 text-lg font-bold text-gray-700">
+                Merma
+              </Text>
               <TextInput
                 className="w-full p-2 border border-gray-300 rounded bg-gray-50"
                 placeholder="Ej: 16.87"
@@ -707,6 +766,10 @@ export const UpdateRegisterDataScreen = () => {
             onChangeText={setRecomendaciones}
           />
         </View>
+
+        <Text className="mb-4 text-lg font-bold text-center text-gray-800">
+          Análisis Sensorial
+        </Text>
 
         <View className="p-2 mb-4 border border-gray-300 rounded-lg bg-gray-50">
           <PickerSelected
@@ -741,6 +804,18 @@ export const UpdateRegisterDataScreen = () => {
             selectedValue={cualidadEspuma}
             onValueChange={setCualidadEspuma}
           />
+
+          <Text className="text-lg font-bold text-center text-gray-700">
+            Descripciones Aromas
+          </Text>
+          <PickerSelectedSaboresAromas
+            selectedValue={(!saboresAromas.length && sabor) || saboresAromas[0]}
+            onValueChange={(itemValue) => agregarSaboresAromas(itemValue)}
+          />
+
+          <Text className="text-lg text-justify text-gray-800">
+            {saboresAromas.length ? saboresAromas.join(", ") : ""}
+          </Text>
         </View>
 
         <View className="p-2 mb-4 border border-gray-300 rounded-lg bg-gray-50">
@@ -768,32 +843,18 @@ export const UpdateRegisterDataScreen = () => {
               <Text>Valor: {value.toFixed(2)}</Text>
             </View>
           ))}
-
           <Text className="text-lg font-bold text-center text-gray-700">
-            Descripciones Positivas y Negativas Sabores / Aromas
+            Descripciones Sabores
           </Text>
-          <Text className="text-lg font-bold text-gray-800">Positivas</Text>
           <PickerSelectedSaboresAromas
-            selectedValue={(!saboresAromas.length && sabor) || saboresAromas[0]}
-            onValueChange={(itemValue) => agregarSaboresAromas(itemValue)}
-          />
-          <Text className="text-lg text-justify text-gray-800">
-            {saboresAromas.length ? saboresAromas.join(", ") : ""}
-          </Text>
-          <Text className="text-lg font-bold text-gray-800">Negativas</Text>
-          <PickerSelectedSaboresNegativas
             selectedValue={
-              (!saboresAromasNegativas.length && saborResidual) ||
-              saboresAromasNegativas[0]
+              (!saboresResidual.length && saborResidual) || saboresResidual[0]
             }
-            onValueChange={(itemValue) =>
-              agregarSaboresAromasNegativas(itemValue)
-            }
+            onValueChange={(itemValue) => agregarSaboresResidual(itemValue)}
           />
+
           <Text className="text-lg text-justify text-gray-800">
-            {SaboresAromasNegativas.length
-              ? saboresAromasNegativas.join(", ")
-              : ""}
+            {saboresResidual.length ? saboresResidual.join(", ") : ""}
           </Text>
         </View>
         <View className="p-2 mb-4 border border-gray-300 rounded-lg bg-gray-50">
@@ -816,9 +877,8 @@ export const UpdateRegisterDataScreen = () => {
             onValueChange={setIntensidadAcidez}
           />
           <Text className="text-lg font-bold text-center text-gray-700">
-            Descripciones Positivas y Negativas
+            Descripciones Acidez
           </Text>
-          <Text className="text-lg font-bold text-gray-800">Positivas</Text>
           <PickeSelectedIntensidadAcidez
             selectedValue={
               (!descripcionesAcidez.length && acidez) || descripcionesAcidez[0]
@@ -827,21 +887,6 @@ export const UpdateRegisterDataScreen = () => {
           />
           <Text className="text-lg text-justify text-gray-800">
             {descripcionesAcidez.length ? descripcionesAcidez.join(", ") : ""}
-          </Text>
-          <Text className="text-lg font-bold text-gray-800">Negativas</Text>
-          <PickeSelectedIntensidadAcidezNegativas
-            selectedValue={
-              (!descripcionesAcidezNegativas.length && intensidadAcidez) ||
-              descripcionesAcidezNegativas[0]
-            }
-            onValueChange={(itemValue) =>
-              agregarDescripcionesAcidezNegativas(itemValue)
-            }
-          />
-          <Text className="text-lg text-justify text-gray-800">
-            {descripcionesAcidezNegativas.length
-              ? descripcionesAcidezNegativas.join(", ")
-              : ""}
           </Text>
         </View>
 
@@ -865,9 +910,8 @@ export const UpdateRegisterDataScreen = () => {
             onValueChange={(itemValue) => setIntensidadCuerpo(itemValue)}
           />
           <Text className="text-lg font-bold text-center text-gray-700">
-            Descripciones Positivas y Negativas
+            Descripciones sensación en boca
           </Text>
-          <Text className="text-lg font-bold text-gray-800">Positivas</Text>
           <PickeSelectedIntensidadCuerpo
             selectedValue={
               (!descripcionesCuerpo.length && cuerpo) || descripcionesCuerpo[0]
@@ -877,76 +921,99 @@ export const UpdateRegisterDataScreen = () => {
           <Text className="text-lg text-justify text-gray-800">
             {descripcionesCuerpo.length ? descripcionesCuerpo.join(", ") : ""}
           </Text>
-          <Text className="text-lg font-bold text-gray-800">Negativas</Text>
-          <PickeSelectedIntensidadCuerpoNegativas
-            selectedValue={
-              (!descripcionesCuerpoNegativas.length && intensidadCuerpo) ||
-              descripcionesCuerpoNegativas[0]
-            }
-            onValueChange={(itemValue) =>
-              agregarDescripcionesCuerpoNegativas(itemValue)
-            }
-          />
-          <Text className="text-lg text-justify text-gray-800">
-            {descripcionesCuerpoNegativas.length
-              ? descripcionesCuerpoNegativas.join(", ")
-              : ""}
-          </Text>
         </View>
         <View className="p-2 mb-4 border border-gray-300 rounded-lg bg-gray-50">
-          {[
-            {
-              label: "Uniformidad",
-              value: uniformidad,
-              setValue: setUniformidad,
-            },
-            { label: "Balance", value: balance, setValue: setBalance },
-          ].map(({ label, value, setValue }) => (
-            <View key={label} className="mb-4">
-              <Text className="mb-2 text-lg font-bold">{label}</Text>
-              <Slider
-                style={{ width: "100%" }}
-                minimumValue={6}
-                maximumValue={10}
-                step={0.25}
-                minimumTrackTintColor="#000000"
-                maximumTrackTintColor="#000000"
-                thumbTintColor="#000000"
-                value={value}
-                onSlidingComplete={(val) => setValue(val)}
-              />
-              <Text>Valor: {value.toFixed(2)}</Text>
-            </View>
-          ))}
+          <Text className="mb-2 font-semibold">Uniformidad</Text>
+          <View className="flex-row flex-wrap">
+            {checkboxesUniformidad.map((state, index) => (
+              <View key={index} className="flex-row items-center mb-2">
+                <TouchableOpacity
+                  onPress={() => handleCheckboxUniformidad(index)}
+                  className="flex items-center justify-center w-8 h-8 mr-2 border border-gray-300 rounded"
+                >
+                  {state === "checked" && (
+                    <MaterialIcons name="check" size={24} color="green" /> // Check verde
+                  )}
+                  {state === "crossed" && (
+                    <MaterialIcons name="close" size={24} color="red" /> // X roja
+                  )}
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+          <View className="mt-4">
+            <Text className="text-lg font-bold">
+              Total puntos: {calcularTotalCheckboxesUniformidad}
+            </Text>
+          </View>
+
+          {[{ label: "Balance", value: balance, setValue: setBalance }].map(
+            ({ label, value, setValue }) => (
+              <View key={label} className="mb-4">
+                <Text className="mb-2 text-lg font-bold">{label}</Text>
+                <Slider
+                  style={{ width: "100%" }}
+                  minimumValue={6}
+                  maximumValue={10}
+                  step={0.25}
+                  minimumTrackTintColor="#000000"
+                  maximumTrackTintColor="#000000"
+                  thumbTintColor="#000000"
+                  value={value}
+                  onSlidingComplete={(val) => setValue(val)}
+                />
+                <Text>Valor: {value.toFixed(2)}</Text>
+              </View>
+            )
+          )}
         </View>
 
         <View className="p-2 mb-4 border border-gray-300 rounded-lg bg-gray-50">
           <Text className="mb-2 font-semibold">Taza Limpia</Text>
           <View className="flex-row flex-wrap">
-            {Array(5)
-              .fill(null)
-              .map((_, index) => (
-                <View key={index} className="flex-row items-center mb-1">
-                  <Checkbox
-                    status={checkboxes[index] ? "checked" : "unchecked"}
-                    onPress={() => handleCheckboxChange(index)}
-                  />
-                </View>
-              ))}
+            {checkboxes.map((state, index) => (
+              <View key={index} className="flex-row items-center mb-2">
+                <TouchableOpacity
+                  onPress={() => handleCheckboxChange(index)}
+                  className="flex items-center justify-center w-8 h-8 mr-2 border border-gray-300 rounded"
+                >
+                  {state === "checked" && (
+                    <MaterialIcons name="check" size={24} color="green" />
+                  )}
+                  {state === "crossed" && (
+                    <MaterialIcons name="close" size={24} color="red" />
+                  )}
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
+          <View className="mt-4">
+            <Text className="text-lg font-bold">
+              Total puntos: {calcularTotalCheckboxesTasaLimpia}
+            </Text>
+          </View>
+
           <Text className="mb-2 text-lg font-bold">Dulzor</Text>
           <View className="flex-row flex-wrap mb-4">
-            {Array(5)
-              .fill(null)
-              .map((_, index) => (
-                <View key={index} className="flex-row items-center mb-1">
-                  <Checkbox
-                    status={checkboxesDulzor[index] ? "checked" : "unchecked"}
-                    onPress={() => handleCheckboxChangeDulzor(index)}
-                  />
-                </View>
-              ))}
+            {checkboxesDulzor.map((state, index) => (
+              <View key={index} className="flex-row items-center mb-2">
+                <TouchableOpacity
+                  onPress={() => handleCheckboxChangeDulzor(index)}
+                  className="flex items-center justify-center w-8 h-8 mr-2 border border-gray-300 rounded"
+                >
+                  {state === "checked" && (
+                    <MaterialIcons name="check" size={24} color="green" />
+                  )}
+                  {state === "crossed" && (
+                    <MaterialIcons name="close" size={24} color="red" />
+                  )}
+                </TouchableOpacity>
+              </View>
+            ))}
           </View>
+          <Text className="mb-2 text-lg font-bold">
+            Total: {calcularTotalCheckboxesDulzor}
+          </Text>
         </View>
         <View className="p-2 mb-4 border border-gray-300 rounded-lg bg-gray-50">
           <Text className="mb-2 text-lg font-bold">Puntaje Catador</Text>
@@ -962,6 +1029,15 @@ export const UpdateRegisterDataScreen = () => {
             onSlidingComplete={(val) => setPuntajeCatador(val)}
           />
           <Text>Valor: {puntajeCatador.toFixed(2)}</Text>
+        </View>
+        <View className="mb-4">
+          <Text className="mb-2 text-lg font-bold">Resultados:</Text>
+          <Text className="font-bold">
+            Suma: {calcularSumaSliders.toFixed(2)}
+          </Text>
+          <Text className="font-bold">
+            Puntaje Final: {calcularNotaFinal.toFixed(2)}
+          </Text>
         </View>
 
         <View className="p-2 mb-4 border border-gray-300 rounded-lg bg-gray-50">
@@ -996,12 +1072,17 @@ export const UpdateRegisterDataScreen = () => {
                 />
               </View>
             </View>
-            <View className="items-center justify-center flex-1">
+            <View className="items-center justify-center flex-1 my-2">
               <Text className="text-sm font-bold text-gray-700">Defectos</Text>
               <Text className="p-2 text-center bg-gray-100 border border-gray-300 rounded">
                 = {calcularDefectos}
               </Text>
             </View>
+          </View>
+          <View className="mb-4">
+            <Text className="font-bold">
+              Puntaje Final: {calcularNotaFinal.toFixed(2)}
+            </Text>
           </View>
         </View>
 
@@ -1018,30 +1099,6 @@ export const UpdateRegisterDataScreen = () => {
             />
           </View>
         </View>
-        <View className="p-2 mb-4 border border-gray-300 rounded-lg bg-gray-50">
-          <View className="mb-4">
-            <Text className="mb-2 text-lg font-bold">Observaciones</Text>
-            <TextInput
-              className="p-2 border border-gray-300 rounded h-28"
-              placeholder="Observaciones"
-              multiline
-              numberOfLines={4}
-              value={observaciones}
-              onChangeText={setObservaciones}
-            />
-          </View>
-        </View>
-
-        <View className="mb-4">
-          <Text className="mb-2 text-lg font-bold">Resultados:</Text>
-          <Text className="font-bold">
-            Suma: {calcularSumaSliders.toFixed(2)}
-          </Text>
-          <Text className="font-bold">
-            Puntaje Final: {calcularNotaFinal.toFixed(2)}
-          </Text>
-        </View>
-
         <View className="items-center justify-center mb-10">
           <Button
             style={{

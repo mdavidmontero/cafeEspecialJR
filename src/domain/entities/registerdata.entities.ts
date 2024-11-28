@@ -3,6 +3,15 @@ export type acidezData = {
   intensidadAcidez: string;
   descripcionesAcidez: string[];
 };
+export type ObservacionesGrupoI = {
+  grupoI: number;
+  observacionesGrupoI: string[];
+};
+
+export type ObservacionesGrupoII = {
+  grupoII: number;
+  observacionesGrupoII: string[];
+};
 
 export type cuerpoData = {
   cuerpo: number;
@@ -14,6 +23,7 @@ export type FraganiaData = {
   fragancia: number;
   cualidadSeco: string;
   cualidadEspuma: string;
+  descripcionesAroma: string[];
 };
 export type defectosData = {
   Nrotazas: number;
@@ -24,7 +34,7 @@ export type defectosData = {
 export type SaboresData = {
   sabor: number;
   saborResidual: number;
-  saboresAromas: string[];
+  saboresSabores: string[];
 };
 
 export interface RegisterCatacion {
@@ -38,11 +48,12 @@ export interface RegisterCatacion {
   proceso: string;
   humedadCPS: number;
   humedadAlmendra: number;
+  muestraCPS: number;
   almendraTotal: number;
   almendraSana: number;
   broca: number;
-  grupoI: number;
-  grupoII: number;
+  grupoI: ObservacionesGrupoI;
+  grupoII: ObservacionesGrupoII;
   factorRendimiento: number;
   totalCafeValor: number;
   recomendaciones: string;
@@ -65,4 +76,17 @@ export interface RegisterCatacion {
 
 export type RegisterCatacionSchema = RegisterCatacion & {
   id: string;
+};
+
+export type RegisterLote = {
+  nombre: string;
+  fecha: Date;
+  records: string[];
+};
+
+export type LotesRegisterSchema = {
+  id: string;
+  nombre: string;
+  fecha: Date;
+  records: RegisterLote;
 };

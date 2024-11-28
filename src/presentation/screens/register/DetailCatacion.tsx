@@ -96,7 +96,6 @@ export const DetailCatacion = () => {
           data?.codigoMuestra || "N/A"
         }</td></tr>
         <tr><td>Municipio</td><td>${data?.municipio || "N/A"}</td></tr>
-        <tr><td>Código CGB</td><td>${data?.codigoCGB || "N/A"}</td></tr>
         <tr><td>Código SICA</td><td>${data?.codigoSICA || "N/A"}</td></tr>
         <tr><td>Proceso</td><td>${data?.proceso || "N/A"}</td></tr>
         <tr><td>Productor</td><td>${data?.productor || "N/A"}</td></tr>
@@ -120,7 +119,6 @@ export const DetailCatacion = () => {
         <tr><td>% Broca </td><td>  ${data?.broca || "N/A"}</td></tr>
         <tr><td>Grupo I</td><td>${data?.grupoI || "N/A"}</td></tr>
         <tr><td>Grupo II</td><td>${data?.grupoII || "N/A"}</td></tr>
-        <tr><td>Anotaciones</td><td>${data?.anotacionesGrupo || "N/A"}</td></tr>
         <tr><td>Factor de Rendimiento</td><td>${
           data?.factorRendimiento || "N/A"
         }</td></tr>
@@ -151,12 +149,10 @@ export const DetailCatacion = () => {
         <tr><td>Sabor Residual</td><td>${
           data?.sabor.saborResidual || "N/A"
         }</td></tr>
-        <tr><td>Sabor Residual</td><td> Positivas: ${
-          data?.sabor.saboresAromas.join(", ") || "N/A"
+        <tr><td>Sabor Residual</td><td> Descripciones: ${
+          data?.sabor.saboresSabores.join(", ") || "N/A"
         }</td></tr>
-        <tr><td>Sabor Residual</td><td> Negativas: ${
-          data?.sabor.saboresAromasNegativas.join(", ") || "N/A"
-        }</td></tr>
+       
         <tr><td>Acidez</td><td>${data?.acidez.acidez || "N/A"}</td></tr>
         <tr><td>Intensidad de Acidez</td><td>${
           data?.acidez.intensidadAcidez || "N/A"
@@ -164,9 +160,7 @@ export const DetailCatacion = () => {
         <tr><td>Descripciones Acidez</td><td>${
           data?.acidez.descripcionesAcidez.join(", ") || "N/A"
         }</td></tr>
-        <tr><td>Descripciones Acidez Negativas</td><td>${
-          data?.acidez.descripcionesAcidezNegativas.join(", ") || "N/A"
-        }</td></tr>
+   
         <tr><td>Cuerpo</td><td>${data?.cuerpo.cuerpo || "N/A"}</td></tr>
         <tr><td>Intensidad de Cuerpo</td><td>${
           data?.cuerpo.intensidadCuerpo || "N/A"
@@ -174,9 +168,7 @@ export const DetailCatacion = () => {
         <tr><td>Descripciones Cuerpo</td><td>${
           data?.cuerpo.descripcionesCuerpo.join(", ") || "N/A"
         }</td></tr>
-        <tr><td>Descripciones Cuerpo Negativas</td><td>${
-          data?.cuerpo.descripcionesCuerpoNegativas.join(", ") || "N/A"
-        }</td></tr>
+     
         <tr><td>Uniformidad</td><td>${data?.uniformidad || "N/A"}</td></tr>
         <tr><td>Balance</td><td>${data?.balance || "N/A"}</td></tr>
         <tr><td>Tasa Limpia</td><td>${data?.tasaLimpia || "N/A"}</td></tr>
@@ -204,11 +196,7 @@ export const DetailCatacion = () => {
       <h2>Notas</h2>
       <p>${data?.notas || "N/A"}</p>
     </div>
-    <div class="section">
-      <h2>Observaciones</h2>
-      <p>${data?.observaciones || "N/A"}</p>
-    </div>
-
+   
     <div class="section">
       <h2>Resultados</h2>
       <table>
@@ -276,10 +264,6 @@ export const DetailCatacion = () => {
             {data?.municipio}
           </Text>
           <Text className="mt-1 text-base text-gray-600">
-            <Text className="font-medium text-gray-800">Código CGB:</Text>
-            {data?.codigoCGB}
-          </Text>
-          <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">Código SICA:</Text>
             {data?.codigoSICA}
           </Text>
@@ -327,17 +311,17 @@ export const DetailCatacion = () => {
           </Text>
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">Grupo I:</Text>
-            {data?.grupoI}
+            {data?.grupoI.grupoI}
           </Text>
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">Grupo II:</Text>
-            {data?.grupoII}
+            {data?.grupoII.grupoII}
           </Text>
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">
               Anotaciones Grupo:
             </Text>
-            {data?.anotacionesGrupo}
+            {data?.grupoI.observacionesGrupoI.join(", ")}
           </Text>
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">
@@ -397,12 +381,7 @@ export const DetailCatacion = () => {
           </Text>
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-bold">Positivas:</Text>{" "}
-            {data?.sabor.saboresAromas.join(", ") || "N/A"}
-          </Text>
-
-          <Text className="mt-1 text-base text-gray-600">
-            <Text className="font-medium text-gray-800">Negativas:</Text>
-            {data?.sabor.saboresAromasNegativas.join(", ") || "N/A"}
+            {data?.sabor.saboresSabores.join(", ") || "N/A"}
           </Text>
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">Acidez:</Text>
@@ -423,7 +402,7 @@ export const DetailCatacion = () => {
           </Text>
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">Negativas:</Text>
-            {data?.acidez.descripcionesAcidezNegativas.join(", ") || "N/A"}
+            {data?.acidez.descripcionesAcidez.join(", ") || "N/A"}
           </Text>
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">Cuerpo:</Text>
@@ -442,10 +421,6 @@ export const DetailCatacion = () => {
             <Text className="font-medium text-gray-800">Positivas:</Text>
             {data?.cuerpo.descripcionesCuerpo.join(", ") || "N/A"}
           </Text>
-          <Text className="mt-1 text-base text-gray-600">
-            <Text className="font-medium text-gray-800">Negativas:</Text>
-            {data?.cuerpo.descripcionesCuerpoNegativas.join(", ") || "N/A"}
-          </Text>
 
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">Uniformidad:</Text>
@@ -462,6 +437,16 @@ export const DetailCatacion = () => {
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">Dulzor:</Text>
             {data?.dulzor}
+          </Text>
+        </View>
+
+        <View className="p-6 mb-8 bg-white rounded-lg shadow-md">
+          <Text className="text-xl font-semibold text-gray-700">
+            Resultados
+          </Text>
+          <Text className="mt-2 text-base text-gray-600">
+            <Text className="font-medium text-gray-800">Suma:</Text>
+            {data?.suma}
           </Text>
         </View>
 
@@ -484,28 +469,16 @@ export const DetailCatacion = () => {
             {data?.defectos.totalDefectos}
           </Text>
         </View>
-
         <View className="p-6 mb-8 bg-white rounded-lg shadow-md">
-          <Text className="text-xl font-semibold text-gray-700">Notas</Text>
-          <Text className="mt-2 text-base text-gray-600">{data?.notas}</Text>
-        </View>
-
-        <View className="p-6 mb-8 bg-white rounded-lg shadow-md">
-          <Text className="text-xl font-semibold text-gray-700">
-            Resultados
-          </Text>
-          <Text className="mt-2 text-base text-gray-600">
-            <Text className="font-medium text-gray-800">Suma:</Text>
-            {data?.suma}
-          </Text>
           <Text className="mt-1 text-base text-gray-600">
             <Text className="font-medium text-gray-800">Puntaje Final:</Text>
             {data?.puntajeFinal}
           </Text>
-          <Text className="mt-1 text-base text-gray-600">
-            <Text className="font-medium text-gray-800">Observaciones:</Text>
-            {data?.observaciones}
-          </Text>
+        </View>
+
+        <View className="p-6 mb-8 bg-white rounded-lg shadow-md">
+          <Text className="text-xl font-semibold text-gray-700">Notas</Text>
+          <Text className="mt-2 text-base text-gray-600">{data?.notas}</Text>
         </View>
       </View>
     </MainLayout>

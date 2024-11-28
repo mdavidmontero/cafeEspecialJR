@@ -9,6 +9,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LoteListScreen } from "../screens/register/DetailLotes";
 
 const Tab = createBottomTabNavigator();
 
@@ -81,10 +82,19 @@ function BottonTabsNavigation() {
       />
       <Tab.Screen
         name="Configuracion"
-        component={HistoryRegisterCatacion}
+        component={LoteListScreen}
         options={{
           tabBarIcon: () => (
             <FontAwesome name="history" size={28} color={"white"} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="ListCataciones"
+        component={HistoryRegisterCatacion}
+        options={{
+          tabBarIcon: () => (
+            <MaterialIcons name="location-history" size={28} color={"white"} />
           ),
         }}
       />

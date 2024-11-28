@@ -6,6 +6,7 @@ import {
   TextInput,
   Alert,
   TouchableOpacity,
+  ToastAndroid,
 } from "react-native";
 import Slider from "@react-native-community/slider";
 import { Button } from "react-native-paper";
@@ -21,11 +22,12 @@ import {
 import {
   createCatacionCafe,
   getCatacionCafeById,
+  registerLoteCatacion,
   updateCatacionCafe,
 } from "../../../actions/registroCatacion.actions";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { PickerSelectedGruposII } from "../../components/shared/PickerSelected";
-import { MaterialIcons } from "@expo/vector-icons"; // Importa Expo Icons
+import { MaterialIcons } from "@expo/vector-icons";
 import NavigationBar from "../../components/ui/NavigationBar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -50,7 +52,6 @@ export const RegisterData = () => {
   const [observacionesGrupoII, setObservacionesGrupoII] = useState<string[]>(
     []
   );
-  const [anotacionesGrupo, setAnotacionesGrupo] = useState<string>("");
   const [factorRendimiento, setFactorRendimiento] = useState<string>("0");
   const [totalCafeValor, setTotalCafeValor] = useState<string>("0");
   const [recomendaciones, setRecomendaciones] = useState("");
@@ -89,8 +90,10 @@ export const RegisterData = () => {
   const [checkboxesUniformidad, setCheckboxesUniformidad] = useState<
     ("checked" | "crossed" | "unchecked")[]
   >(Array(5).fill("unchecked"));
-  const [records, setRecords] = useState<any[]>([]);
+  const [records, setRecords] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [limpio, setLimpio] = useState(true);
+  const [nombreLote, setNombreLote] = useState<string>("");
 
   const queryClient = useQueryClient();
   useEffect(() => {
@@ -305,6 +308,7 @@ export const RegisterData = () => {
       setDescripcionesCuerpo([...descripcionesCuerpo, item]);
     }
   };
+
   const savedAsynStorage = async (
     id: string,
     setRecords: React.Dispatch<React.SetStateAction<any[]>>
@@ -321,15 +325,32 @@ export const RegisterData = () => {
       console.error("Error al guardar en AsyncStorage:", error);
     }
   };
-
-  const clearStorage = async () => {
+  const clearStorageAnSaveLote = async () => {
     try {
+      if (records.length === 0) {
+        Alert.alert("Error", "No hay muestras registradas");
+        return;
+      }
+      await registerLoteCatacion({
+        nombre: nombreLote,
+        records: records,
+        fecha: new Date(),
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["loteDetails"] });
+      Alert.alert("Lote Guardado", "Lote de Muestras Guardado correctamente", [
+        { text: "OK", onPress: () => console.log("OK Pressed") },
+      ]);
+
       await AsyncStorage.removeItem("formRecords");
+      setLimpio(true);
+      setCurrentIndex(0);
       setRecords([]);
     } catch (error) {
-      console.error("Error al borrar en AsyncStorage:", error);
+      console.error("Error al procesar la operación:", error);
     }
   };
+
   const getData = async () => {
     try {
       const data = await getCatacionCafeById(records[currentIndex]);
@@ -341,13 +362,16 @@ export const RegisterData = () => {
         setProductor(data.productor);
         setCedula(data.cedula);
         setVariedad(data.variedad);
+        setMuestraCPS(data.muestraCPS.toString());
         setHumedadCPS(data.humedadCPS.toString());
         setHumedadAlmendra(data.humedadAlmendra.toString());
         setAlmendraTotal(data.almendraTotal.toString());
         setAlmendraSana(data.almendraSana.toString());
         setBroca(data.broca.toString());
         setGrupoI(data.grupoI.toString());
+        setObservacionesGrupoI(data.grupoI.observacionesGrupoI);
         setGrupoII(data.grupoII.toString());
+        setObservacionesGrupoII(data.grupoII.observacionesGrupoII);
         setFactorRendimiento(data.factorRendimiento.toString());
         setRecomendaciones(data.recomendaciones);
         setTotalCafeValor(data.totalCafeValor.toString());
@@ -355,20 +379,22 @@ export const RegisterData = () => {
         setFragancia(data.fragancia.fragancia);
         setCualidadSeco(data.fragancia.cualidadSeco);
         setCualidadEspuma(data.fragancia.cualidadEspuma);
+        setSaboresAromas(data.fragancia.descripcionesAroma);
         setSabor(data.sabor.sabor);
         setSaborResidual(data.sabor.saborResidual);
-        setSaboresAromas(data.sabor.saboresAromas);
+        setSaboresResidual(data.sabor.saboresSabores);
         setAcidez(data.acidez.acidez);
         setIntensidadAcidez(data.acidez.intensidadAcidez);
         setDescripcionesAcidez(data.acidez.descripcionesAcidez);
         setCuerpo(data.cuerpo.cuerpo);
         setIntensidadCuerpo(data.cuerpo.intensidadCuerpo);
         setDescripcionesCuerpo(data.cuerpo.descripcionesCuerpo);
-        setIntensidadCuerpo(data.cuerpo.intensidadCuerpo);
-        setDescripcionesCuerpo(data.cuerpo.descripcionesCuerpo);
+
         setUniformidad(+data.uniformidad);
         setBalance(+data.balance);
         setCheckboxesDulzor(Array(5).fill(false));
+        setCheckboxesUniformidad(Array(5).fill(false));
+        setCheckboxes(Array(5).fill(false));
         setPuntajeCatador(+data.puntajeCatador);
         setTazas(data.defectos.Nrotazas);
         setIntensidad(data.defectos.intensidad);
@@ -379,65 +405,202 @@ export const RegisterData = () => {
     }
   };
 
-  const handleRegistroCatacion = async () => {
-    const data = {
-      fecha: new Date(),
-      codigoMuestra: codigoMuestra,
-      municipio: municipio,
-      departamento: departamento,
-      codigoSICA: codigoSICA,
-      proceso: proceso,
-      productor: productor,
-      cedula: cedula,
-      variedad: variedad,
-      humedadCPS: +humedadCPS,
-      humedadAlmendra: +humedadAlmendra,
-      almendraTotal: +almendraTotal,
-      almendraSana: +almendraSana,
-      broca: +broca,
+  const dataEnvio = {
+    fecha: new Date(),
+    codigoMuestra: codigoMuestra,
+    codigoSICA: codigoSICA,
+    departamento: departamento,
+    municipio: municipio,
+    proceso: proceso,
+    productor: productor,
+    cedula: cedula,
+    variedad: variedad,
+    humedadCPS: +humedadCPS,
+    humedadAlmendra: +humedadAlmendra,
+    muestraCPS: +muestraCPS,
+    almendraTotal: +almendraTotal,
+    almendraSana: +almendraSana,
+    broca: +broca,
+    grupoI: {
       grupoI: +grupoI,
+      observacionesGrupoI: observacionesGrupoI,
+    },
+    grupoII: {
       grupoII: +grupoII,
-      anotacionesGrupo: anotacionesGrupo,
-      factorRendimiento: +factorRendimiento,
-      recomendaciones: recomendaciones,
-      totalCafeValor: +totalCafeValor,
-      nivelTueste: nivelTueste,
-      fragancia: {
-        fragancia: fragancia,
-        cualidadSeco: cualidadSeco,
-        cualidadEspuma: cualidadEspuma,
-      },
-      sabor: {
-        sabor: sabor,
-        saborResidual: saborResidual,
-        saboresAromas: saboresAromas,
-      },
+      observacionesGrupoII: observacionesGrupoII,
+    },
+    observacionesGrupoII: observacionesGrupoII,
+    factorRendimiento: +factorRendimiento,
+    totalCafeValor: +totalCafeValor,
+    recomendaciones: recomendaciones,
+    nivelTueste: nivelTueste,
+    fragancia: {
+      fragancia: fragancia,
+      cualidadSeco: cualidadSeco,
+      cualidadEspuma: cualidadEspuma,
+      descripcionesAroma: saboresAromas,
+    },
+    sabor: {
+      sabor: sabor,
       saborResidual: saborResidual,
-      acidez: {
-        acidez: acidez,
-        intensidadAcidez: intensidadAcidez,
-        descripcionesAcidez: descripcionesAcidez,
-      },
-      cuerpo: {
-        cuerpo: cuerpo,
-        intensidadCuerpo: intensidadCuerpo,
-        descripcionesCuerpo: descripcionesCuerpo,
-      },
-      uniformidad: uniformidad,
-      balance: balance,
-      tasaLimpia: nroTasalimpia,
-      dulzor: nroDulzor,
-      puntajeCatador: puntajeCatador,
-      defectos: {
-        Nrotazas: tazas,
-        intensidad: intensidad,
-        totalDefectos: calcularDefectos,
-      },
-      notas: notas,
-      suma: calcularSumaSliders,
-      puntajeFinal: calcularNotaFinal,
-    };
+      saboresSabores: saboresResidual,
+    },
+    acidez: {
+      acidez: acidez,
+      intensidadAcidez: intensidadAcidez,
+      descripcionesAcidez: descripcionesAcidez,
+    },
+    cuerpo: {
+      cuerpo: cuerpo,
+      intensidadCuerpo: intensidadCuerpo,
+      descripcionesCuerpo: descripcionesCuerpo,
+    },
+    uniformidad: uniformidad,
+    balance: balance,
+    tasaLimpia: nroTasalimpia,
+    dulzor: nroDulzor,
+    puntajeCatador: puntajeCatador,
+    defectos: {
+      Nrotazas: tazas,
+      intensidad: intensidad,
+      totalDefectos: calcularDefectos,
+    },
+    notas: notas,
+    suma: calcularSumaSliders,
+    puntajeFinal: calcularNotaFinal,
+  };
 
+  const handleAddMuestra = async () => {
+    const data = dataEnvio;
+    try {
+      if (limpio === false) {
+        setLimpio(true);
+        setCodigoMuestra("");
+        setMunicipiop("");
+        setDepartamento("");
+        setCodigoSICA("");
+        setProductor("");
+        setCedula("");
+        setVariedad("");
+        setHumedadCPS("0");
+        setHumedadAlmendra("0");
+        setAlmendraTotal("0");
+        setAlmendraSana("0");
+        setBroca("0");
+        setGrupoI("0");
+        setGrupoII("0");
+        setFactorRendimiento("0");
+        setRecomendaciones("");
+        setTotalCafeValor("0");
+        setNivelTueste("");
+        setFragancia(6);
+        setCualidadSeco("");
+        setCualidadEspuma("");
+        setSabor(6);
+        setSaborResidual(6);
+        setSaboresAromas([]);
+        setSaboresResidual([]);
+        setObservacionesGrupoII([]);
+        setObservacionesGrupoI([]);
+        setAcidez(6);
+        setIntensidadAcidez("");
+        setDescripcionesAcidez([]);
+        setCuerpo(6);
+        setIntensidadCuerpo("");
+        setDescripcionesCuerpo([]);
+        setUniformidad(6);
+        setBalance(6);
+        setPuntajeCatador(6);
+        setCheckboxesUniformidad(Array(5).fill("unchecked"));
+        setCheckboxes(Array(5).fill("unchecked"));
+        setCheckboxesUniformidad(Array(5).fill("unchecked"));
+        setNroTasalimpia(0);
+        setNroDulzor(0);
+        setTazas(0);
+        setIntensidad(0);
+        setNotas("");
+        setTazas(0);
+      } else if (limpio === true) {
+        const createcata = await createCatacionCafe(data);
+        await savedAsynStorage(createcata, setRecords);
+
+        const puntofinal = records.length;
+        const calculo = puntofinal - currentIndex + 1;
+        setCurrentIndex(calculo);
+        ToastAndroid.show("Muestra agregada correctamente", ToastAndroid.SHORT);
+        queryClient.invalidateQueries({ queryKey: ["catacionData"] });
+        setCodigoMuestra("");
+        setMunicipiop("");
+        setDepartamento("");
+        setCodigoSICA("");
+        setProductor("");
+        setCedula("");
+        setVariedad("");
+        setHumedadCPS("0");
+        setHumedadAlmendra("0");
+        setAlmendraTotal("0");
+        setAlmendraSana("0");
+        setBroca("0");
+        setGrupoI("0");
+        setGrupoII("0");
+        setFactorRendimiento("0");
+        setRecomendaciones("");
+        setTotalCafeValor("0");
+        setNivelTueste("");
+        setFragancia(6);
+        setCualidadSeco("");
+        setCualidadEspuma("");
+        setSabor(6);
+        setSaborResidual(6);
+        setSaboresAromas([]);
+        setAcidez(6);
+        setIntensidadAcidez("");
+        setDescripcionesAcidez([]);
+        setCuerpo(6);
+        setIntensidadCuerpo("");
+        setDescripcionesCuerpo([]);
+        setUniformidad(6);
+        setBalance(6);
+        setPuntajeCatador(6);
+        setCheckboxesUniformidad(Array(5).fill("unchecked"));
+        setCheckboxes(Array(5).fill("unchecked"));
+        setCheckboxesUniformidad(Array(5).fill("unchecked"));
+        setNroTasalimpia(0);
+        setNroDulzor(0);
+        setTazas(0);
+        setIntensidad(0);
+        setNotas("");
+        setTazas(0);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const goToNext = async () => {
+    setCurrentIndex(currentIndex + 1);
+    setLimpio(false);
+    if (currentIndex < records.length - 1) {
+      await updateCatacionCafe(records[currentIndex], dataEnvio);
+      ToastAndroid.show(
+        "Muestra actualizada correctamente",
+        ToastAndroid.SHORT
+      );
+    }
+  };
+
+  const goToPrevious = async () => {
+    setCurrentIndex(currentIndex - 1);
+    setLimpio(false);
+    if (currentIndex > 0) {
+      await updateCatacionCafe(records[currentIndex], dataEnvio);
+      ToastAndroid.show(
+        "Muestra actualizada correctamente",
+        ToastAndroid.SHORT
+      );
+    }
+  };
+  const handleRegistroCatacion = async () => {
+    const data = dataEnvio;
     try {
       if (records[currentIndex]) {
         await updateCatacionCafe(records[currentIndex], data);
@@ -453,7 +616,6 @@ export const RegisterData = () => {
           { text: "OK", onPress: () => console.log("OK Pressed") },
         ]);
       }
-      // Invalidar la consulta después de crear o actualizar
       queryClient.invalidateQueries({ queryKey: ["catacionData"] });
 
       setCodigoMuestra("");
@@ -470,7 +632,6 @@ export const RegisterData = () => {
       setBroca("0");
       setGrupoI("0");
       setGrupoII("0");
-      setAnotacionesGrupo("");
       setFactorRendimiento("0");
       setRecomendaciones("");
       setTotalCafeValor("0");
@@ -493,7 +654,6 @@ export const RegisterData = () => {
       setCheckboxesUniformidad(Array(5).fill("unchecked"));
       setCheckboxes(Array(5).fill("unchecked"));
       setCheckboxesUniformidad(Array(5).fill("unchecked"));
-
       setNroTasalimpia(0);
       setNroDulzor(0);
       setTazas(0);
@@ -511,12 +671,25 @@ export const RegisterData = () => {
         setRecords={setRecords}
         currentIndex={currentIndex}
         setCurrentIndex={setCurrentIndex}
+        goToNext={goToNext}
+        goToPrevious={goToPrevious}
       />
       <ScrollView contentContainerStyle={{ padding: 12 }}>
         <Text className="mb-4 text-2xl font-bold text-center">
           Formulario de Catación
         </Text>
-        <Text className="mb-2 text-lg font-bold">
+        <View className="flex-1 my-2">
+          <Text className="text-lg font-bold text-gray-700">
+            Codigo del Lote o Nombre
+          </Text>
+          <TextInput
+            className="w-full p-3 border border-gray-300 rounded bg-gray-50"
+            placeholder="Nombre del Lote o código"
+            value={nombreLote}
+            onChangeText={setNombreLote}
+          />
+        </View>
+        <Text className="mb-2 text-lg font-bold text-center">
           Análisis Fisico y Sensorial
         </Text>
         <View className="gap-4 mb-6">
@@ -562,8 +735,6 @@ export const RegisterData = () => {
               onChangeText={setMunicipiop}
             />
           </View>
-
-          <View className="flex-row gap-2"></View>
 
           <View className="flex-1">
             <PickerSelectedProceso
@@ -875,7 +1046,7 @@ export const RegisterData = () => {
           />
 
           <Text className="text-lg text-justify text-gray-800">
-            {saboresAromas.length ? saboresAromas.join(", ") : ""}
+            {saboresResidual.length ? saboresResidual.join(", ") : ""}
           </Text>
         </View>
         <View className="p-2 mb-4 border border-gray-300 rounded-lg bg-gray-50">
@@ -1121,7 +1292,7 @@ export const RegisterData = () => {
           </View>
         </View>
 
-        <View className="items-center justify-center mb-10">
+        <View className="items-center justify-center gap-2 mb-10">
           <Button
             style={{
               backgroundColor: "#C5A03F",
@@ -1132,10 +1303,11 @@ export const RegisterData = () => {
             }}
             textColor="#FFFFFF"
             mode="contained"
-            onPress={handleRegistroCatacion}
+            onPress={handleAddMuestra}
           >
-            Guardar Resultados
+            Agregar otra muestra
           </Button>
+
           <Button
             style={{
               backgroundColor: "#C5A03F",
@@ -1146,9 +1318,9 @@ export const RegisterData = () => {
             }}
             textColor="#FFFFFF"
             mode="contained"
-            onPress={clearStorage}
+            onPress={clearStorageAnSaveLote}
           >
-            Limpiar data
+            Guardar Lote
           </Button>
         </View>
       </ScrollView>
