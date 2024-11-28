@@ -95,6 +95,15 @@ export const UpdateRegisterDataScreen = () => {
     ("checked" | "crossed" | "unchecked")[]
   >(Array(5).fill("unchecked"));
 
+  const [otrosSabores, setOtrosSabores] = useState<string>("");
+  const [otrasAromas, setOtrasAromas] = useState<string>("");
+  const [otrasCuerpo, setOtrasCuerpo] = useState<string>("");
+  const [otrasAcidez, setOtrasAcidez] = useState<string>("");
+  const [checkActiveOtrosSabores, setCheckActiveOtrosSabores] = useState(false);
+  const [checkActiveOtrasAromas, setCheckActiveOtrasAromas] = useState(false);
+  const [checkActiveOtrasCuerpo, setCheckActiveOtrasCuerpo] = useState(false);
+  const [checkActiveOtrasAcidez, setCheckActiveOtrasAcidez] = useState(false);
+
   const getData = async () => {
     try {
       const data = await getCatacionCafeById(id);
@@ -103,6 +112,7 @@ export const UpdateRegisterDataScreen = () => {
         setMunicipiop(data.municipio);
         setCodigoSICA(data.codigoSICA);
         setProceso(data.proceso);
+        setDepartamento(data.departamento);
         setProductor(data.productor);
         setCedula(data.cedula);
         setVariedad(data.variedad);
@@ -136,13 +146,68 @@ export const UpdateRegisterDataScreen = () => {
         setIntensidadCuerpo(data.cuerpo.intensidadCuerpo);
         setUniformidad(+data.uniformidad);
         setBalance(+data.balance);
-        setCheckboxesDulzor(Array(5).fill(false));
-        setCheckboxesUniformidad(Array(5).fill(false));
-        setCheckboxes(Array(5).fill(false));
         setPuntajeCatador(+data.puntajeCatador);
         setTazas(data.defectos.Nrotazas);
         setIntensidad(data.defectos.intensidad);
         setNotas(data.notas);
+        setOtrasAromas(data.fragancia.otrasAromas!);
+        setOtrosSabores(data.sabor.otrosSabores!);
+        setOtrasCuerpo(data.cuerpo.otrasCuerpo!);
+        setOtrasAcidez(data.acidez.otrasAcidez!);
+        const totalChecboxTasaLimpia = Math.floor(+data.tasaLimpia / 2);
+        const newCheckboxesTasaLimpia = Array(5)
+          .fill("unchecked")
+          .map((_, index) => {
+            if (index < totalChecboxTasaLimpia) {
+              return "checked";
+            }
+            return "unchecked";
+          });
+        setCheckboxes(newCheckboxesTasaLimpia);
+        const totalChecked = Math.floor(+data.uniformidad / 2);
+        const newCheckboxes = Array(5)
+          .fill("unchecked")
+          .map((_, index) => {
+            if (index < totalChecked) {
+              return "checked";
+            }
+            return "unchecked";
+          });
+
+        setCheckboxesUniformidad(newCheckboxes);
+
+        const totalchecboxDulzor = Math.floor(+data.dulzor / 2);
+        const newDulzorCheckboxes = Array(5)
+          .fill("unchecked")
+          .map((_, index) => {
+            if (index < totalchecboxDulzor) {
+              return "checked";
+            }
+            return "unchecked";
+          });
+
+        setCheckboxesDulzor(newDulzorCheckboxes);
+
+        {
+          otrasAromas.length
+            ? setCheckActiveOtrasAromas(true)
+            : setCheckActiveOtrasAromas(false);
+        }
+        {
+          otrosSabores.length
+            ? setCheckActiveOtrosSabores(true)
+            : setCheckActiveOtrosSabores(false);
+        }
+        {
+          otrasCuerpo.length
+            ? setCheckActiveOtrasCuerpo(true)
+            : setCheckActiveOtrasCuerpo(false);
+        }
+        {
+          otrasAcidez.length
+            ? setCheckActiveOtrasAcidez(true)
+            : setCheckActiveOtrasAcidez(false);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -397,21 +462,25 @@ export const UpdateRegisterDataScreen = () => {
       cualidadSeco: cualidadSeco,
       cualidadEspuma: cualidadEspuma,
       descripcionesAroma: saboresAromas,
+      otrasAromas: otrasAromas,
     },
     sabor: {
       sabor: sabor,
       saborResidual: saborResidual,
       saboresSabores: saboresResidual,
+      otrosSabores: otrosSabores,
     },
     acidez: {
       acidez: acidez,
       intensidadAcidez: intensidadAcidez,
       descripcionesAcidez: descripcionesAcidez,
+      otrasAcidez: otrasAcidez,
     },
     cuerpo: {
       cuerpo: cuerpo,
       intensidadCuerpo: intensidadCuerpo,
       descripcionesCuerpo: descripcionesCuerpo,
+      otrasCuerpo: otrasCuerpo,
     },
     uniformidad: uniformidad,
     balance: balance,
@@ -438,7 +507,6 @@ export const UpdateRegisterDataScreen = () => {
         "Catación Actualizada Correctamente",
         [{ text: "OK", onPress: () => console.log("OK Pressed") }]
       );
-
       setCodigoMuestra("");
       setMunicipiop("");
       setDepartamento("");
@@ -469,7 +537,6 @@ export const UpdateRegisterDataScreen = () => {
       setAcidez(6);
       setIntensidadAcidez("");
       setDescripcionesAcidez([]);
-
       setCuerpo(6);
       setIntensidadCuerpo("");
       setDescripcionesCuerpo([]);
@@ -485,6 +552,14 @@ export const UpdateRegisterDataScreen = () => {
       setIntensidad(0);
       setNotas("");
       setTazas(0);
+      setOtrasAromas("");
+      setOtrosSabores("");
+      setOtrasCuerpo("");
+      setOtrasAcidez("");
+      setCheckActiveOtrasAromas(false);
+      setCheckActiveOtrosSabores(false);
+      setCheckActiveOtrasCuerpo(false);
+      setCheckActiveOtrasAcidez(false);
       navigation.goBack();
     } catch (error) {
       Alert.alert("Error al crear catación cafe: ");
@@ -812,6 +887,33 @@ export const UpdateRegisterDataScreen = () => {
             selectedValue={(!saboresAromas.length && sabor) || saboresAromas[0]}
             onValueChange={(itemValue) => agregarSaboresAromas(itemValue)}
           />
+          <View className="flex-row my-2 ">
+            <TouchableOpacity
+              onPress={() => setCheckActiveOtrasAromas(!checkActiveOtrasAromas)}
+              className="w-8 h-8 mr-2 border border-gray-300 rounded"
+            >
+              {checkActiveOtrasAromas ? (
+                <MaterialIcons name="check" size={24} color="green" />
+              ) : (
+                <MaterialIcons
+                  name="radio-button-unchecked"
+                  size={24}
+                  color="gray"
+                />
+              )}
+            </TouchableOpacity>
+            <Text className="text-lg text-justify text-gray-800">Otras</Text>
+          </View>
+          <View className="flex-row my-2 ">
+            {checkActiveOtrasAromas && (
+              <TextInput
+                className="w-full p-2 border border-gray-300 rounded bg-gray-50"
+                placeholder="Otras Aromas"
+                value={otrasAromas}
+                onChangeText={setOtrasAromas}
+              />
+            )}
+          </View>
 
           <Text className="text-lg text-justify text-gray-800">
             {saboresAromas.length ? saboresAromas.join(", ") : ""}
@@ -853,6 +955,37 @@ export const UpdateRegisterDataScreen = () => {
             onValueChange={(itemValue) => agregarSaboresResidual(itemValue)}
           />
 
+          <View className="flex-row my-2 ">
+            <TouchableOpacity
+              onPress={() =>
+                setCheckActiveOtrosSabores(!checkActiveOtrosSabores)
+              }
+              className="w-8 h-8 mr-2 border border-gray-300 rounded"
+            >
+              {checkActiveOtrosSabores ? (
+                <MaterialIcons name="check" size={24} color="green" />
+              ) : (
+                <MaterialIcons
+                  name="radio-button-unchecked"
+                  size={24}
+                  color="gray"
+                />
+              )}
+            </TouchableOpacity>
+            <Text className="text-lg text-justify text-gray-800">
+              Otros Sabores
+            </Text>
+          </View>
+          <View className="flex-row my-2 ">
+            {checkActiveOtrosSabores && (
+              <TextInput
+                className="w-full p-2 border border-gray-300 rounded bg-gray-50"
+                placeholder="Otros Sabores"
+                value={otrosSabores}
+                onChangeText={setOtrosSabores}
+              />
+            )}
+          </View>
           <Text className="text-lg text-justify text-gray-800">
             {saboresResidual.length ? saboresResidual.join(", ") : ""}
           </Text>
@@ -885,6 +1018,35 @@ export const UpdateRegisterDataScreen = () => {
             }
             onValueChange={(itemValue) => agregarDescripcionesAcidez(itemValue)}
           />
+
+          <View className="flex-row my-2 ">
+            <TouchableOpacity
+              onPress={() => setCheckActiveOtrasAcidez(!checkActiveOtrasAcidez)}
+              className="w-8 h-8 mr-2 border border-gray-300 rounded"
+            >
+              {checkActiveOtrasAcidez ? (
+                <MaterialIcons name="check" size={24} color="green" />
+              ) : (
+                <MaterialIcons
+                  name="radio-button-unchecked"
+                  size={24}
+                  color="gray"
+                />
+              )}
+            </TouchableOpacity>
+            <Text className="text-lg text-justify text-gray-800">Otras</Text>
+          </View>
+
+          <View className="flex-row my-2 ">
+            {checkActiveOtrasAcidez && (
+              <TextInput
+                className="w-full p-2 border border-gray-300 rounded bg-gray-50"
+                placeholder="Otras Acidez"
+                value={otrasAcidez}
+                onChangeText={setOtrasAcidez}
+              />
+            )}
+          </View>
           <Text className="text-lg text-justify text-gray-800">
             {descripcionesAcidez.length ? descripcionesAcidez.join(", ") : ""}
           </Text>
@@ -918,6 +1080,33 @@ export const UpdateRegisterDataScreen = () => {
             }
             onValueChange={(itemValue) => agregarDescripcionesCuerpo(itemValue)}
           />
+          <View className="flex-row my-2 ">
+            <TouchableOpacity
+              onPress={() => setCheckActiveOtrasCuerpo(!checkActiveOtrasCuerpo)}
+              className="w-8 h-8 mr-2 border border-gray-300 rounded"
+            >
+              {checkActiveOtrasCuerpo ? (
+                <MaterialIcons name="check" size={24} color="green" />
+              ) : (
+                <MaterialIcons
+                  name="radio-button-unchecked"
+                  size={24}
+                  color="gray"
+                />
+              )}
+            </TouchableOpacity>
+            <Text className="text-lg text-justify text-gray-800">Otras</Text>
+          </View>
+          <View className="flex-row my-2 ">
+            {checkActiveOtrasCuerpo && (
+              <TextInput
+                className="w-full p-2 border border-gray-300 rounded bg-gray-50"
+                placeholder="Otras Cuerpo"
+                value={otrasCuerpo}
+                onChangeText={setOtrasCuerpo}
+              />
+            )}
+          </View>
           <Text className="text-lg text-justify text-gray-800">
             {descripcionesCuerpo.length ? descripcionesCuerpo.join(", ") : ""}
           </Text>

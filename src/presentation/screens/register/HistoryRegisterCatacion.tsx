@@ -53,6 +53,7 @@ export const HistoryRegisterCatacion = () => {
     hasNextPage,
     isFetchingNextPage,
     refetch,
+    isFetching,
   } = useInfiniteQuery({
     queryKey: ["catacionData"],
     queryFn: fetchCatacionPage,
@@ -81,27 +82,25 @@ export const HistoryRegisterCatacion = () => {
       })
     ) ?? [];
 
-  const handleDelete = async (id: string) => {
-    try {
-      Alert.alert("¿Estás seguro de eliminar esta catación?", "Eliminar", [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Eliminar",
-          onPress: async () => {
-            await deleteCatacionCafe(id);
-            refetch();
-          },
-        },
-      ]);
-
-      refetch();
-    } catch (error) {
-      console.error("Error al eliminar catación:", error);
-    }
-  };
+  // const handleDelete = async (id: string) => {
+  //   try {
+  //     Alert.alert("¿Estás seguro de eliminar esta catación?", "Eliminar", [
+  //       {
+  //         text: "Cancelar",
+  //         style: "cancel",
+  //       },
+  //       {
+  //         text: "Eliminar",
+  //         onPress: async () => {
+  //           await deleteCatacionCafe(id);
+  //           refetch();
+  //         },
+  //       },
+  //     ]);
+  //   } catch (error) {
+  //     console.error("Error al eliminar catación:", error);
+  //   }
+  // };
 
   const loadMore = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -126,6 +125,9 @@ export const HistoryRegisterCatacion = () => {
         </Text>
         <Text className="mt-1 text-base text-gray-600">
           Código de Muestra: {item.codigoMuestra}
+        </Text>
+        <Text className="mt-1 text-base text-gray-600">
+          Departamento: {item.departamento}
         </Text>
         <Text className="mt-1 text-base text-gray-600">
           Municipio: {item.municipio}
@@ -174,7 +176,7 @@ export const HistoryRegisterCatacion = () => {
           >
             Actualizar
           </Button>
-          <Button
+          {/* <Button
             textColor="#fff"
             mode="contained"
             onPress={() => handleDelete(item.id)}
@@ -186,7 +188,7 @@ export const HistoryRegisterCatacion = () => {
             }}
           >
             Eliminar
-          </Button>
+          </Button> */}
         </View>
       </View>
     </Pressable>
@@ -259,25 +261,20 @@ export const HistoryRegisterCatacion = () => {
           onEndReachedThreshold={0.5}
           refreshControl={
             <RefreshControl
-              refreshing={isLoading}
-              onRefresh={refetch}
+              refreshing={isFetching}
+              onRefresh={refetch} // Using the refetch method here
               colors={["#CCA644"]}
             />
           }
           ListFooterComponent={
             isFetchingNextPage ? (
-              <ActivityIndicator
-                color="#CCA644"
-                style={{ marginVertical: 20 }}
-              />
+              <ActivityIndicator animating={true} color={"#CCA644"} size={28} />
+            ) : hasNextPage ? (
+              <Pressable onPress={loadMore} className="mb-4">
+                <Text className="text-center text-blue-500">Cargar más</Text>
+              </Pressable>
             ) : null
           }
-          ListEmptyComponent={
-            <Text className="text-lg text-center text-gray-500">
-              No se encontraron registros.
-            </Text>
-          }
-          contentContainerStyle={{ padding: 10 }}
         />
       </View>
     </MainLayout>

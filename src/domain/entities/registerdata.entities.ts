@@ -2,6 +2,7 @@ export type acidezData = {
   acidez: number;
   intensidadAcidez: string;
   descripcionesAcidez: string[];
+  otrasAcidez?: string;
 };
 export type ObservacionesGrupoI = {
   grupoI: number;
@@ -17,6 +18,7 @@ export type cuerpoData = {
   cuerpo: number;
   intensidadCuerpo: string;
   descripcionesCuerpo: string[];
+  otrasCuerpo?: string;
 };
 
 export type FraganiaData = {
@@ -24,6 +26,7 @@ export type FraganiaData = {
   cualidadSeco: string;
   cualidadEspuma: string;
   descripcionesAroma: string[];
+  otrasAromas?: string;
 };
 export type defectosData = {
   Nrotazas: number;
@@ -35,6 +38,7 @@ export type SaboresData = {
   sabor: number;
   saborResidual: number;
   saboresSabores: string[];
+  otrosSabores?: string;
 };
 
 export interface RegisterCatacion {

@@ -45,7 +45,7 @@ function StackNavigator() {
         name="LoteDetailsScreen"
         component={LoteDetailsScreen}
         options={{
-          headerTitle: "Detalles de Catación",
+          headerTitle: "Detalles de Lote",
         }}
       />
     </Stack.Navigator>

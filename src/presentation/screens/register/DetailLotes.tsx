@@ -17,6 +17,7 @@ import { Timestamp } from "firebase/firestore";
 export const LoteListScreen = () => {
   const [lotes, setLotes] = useState<LotesRegisterSchema[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false); // Estado para el pull-to-refresh
   const navigation =
     useNavigation<StackScreenProps<RootStackParamList>["navigation"]>();
 
@@ -34,6 +35,18 @@ export const LoteListScreen = () => {
 
     fetchLotes();
   }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const lotesData = await getLoteCatacion();
+      setLotes(lotesData);
+    } catch (error) {
+      console.error("Error al refrescar los lotes:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
@@ -65,6 +78,8 @@ export const LoteListScreen = () => {
               </View>
             </TouchableOpacity>
           )}
+          refreshing={refreshing} // Establece el estado de refreshing
+          onRefresh={handleRefresh} // Llama a la función de refresco cuando el usuario hace pull-to-refresh
         />
       </View>
     </MainLayout>

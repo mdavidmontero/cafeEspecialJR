@@ -380,7 +380,6 @@ export const DetailCatacion = () => {
             Descripciones Sabor / Aroma:
           </Text>
           <Text className="mt-1 text-base text-gray-600">
-            <Text className="font-bold">Positivas:</Text>{" "}
             {data?.sabor.saboresSabores.join(", ") || "N/A"}
           </Text>
           <Text className="mt-1 text-base text-gray-600">
@@ -397,11 +396,6 @@ export const DetailCatacion = () => {
             Descripciones Acidez:
           </Text>
           <Text className="mt-1 text-base text-gray-600">
-            <Text className="font-medium text-gray-800">Positivas:</Text>
-            {data?.acidez.descripcionesAcidez.join(", ") || "N/A"}
-          </Text>
-          <Text className="mt-1 text-base text-gray-600">
-            <Text className="font-medium text-gray-800">Negativas:</Text>
             {data?.acidez.descripcionesAcidez.join(", ") || "N/A"}
           </Text>
           <Text className="mt-1 text-base text-gray-600">
@@ -418,7 +412,6 @@ export const DetailCatacion = () => {
             Descripciones Cuerpo:
           </Text>
           <Text className="mt-1 text-base text-gray-600">
-            <Text className="font-medium text-gray-800">Positivas:</Text>
             {data?.cuerpo.descripcionesCuerpo.join(", ") || "N/A"}
           </Text>
 
